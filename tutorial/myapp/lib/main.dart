@@ -8,40 +8,44 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('my first app'),
-        centerTitle: true,
-        backgroundColor: Colors.red[600],
-      ),
-      // body: Center(child: Image.asset('assets/image2.png')),
-      // body: Container(
-      //   padding: EdgeInsets.all(90.0),
-      //   margin: EdgeInsets.all(30.0),
-      //   color: Colors.grey[400],
-      //   child: Text('hello'),
-      // ),
-      body: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text('hello'),
-          TextButton(
-            onPressed: () {},
-            style: TextButton.styleFrom(backgroundColor: Colors.amber),
-            child: Text('click me'),
-          ),
-          Container(
-            color: Colors.cyan,
-            padding: EdgeInsets.all(30.0),
-            child: Text('inside container'),
-          )
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: Text('hi'),
-        backgroundColor: Colors.red[500],
-      ),
-    );
+        appBar: AppBar(
+          title: Text('my first app'),
+          centerTitle: true,
+          backgroundColor: Colors.red[600],
+        ),
+        // body: Center(child: Image.asset('assets/image2.png')),
+        // body: Container(
+        //   padding: EdgeInsets.all(90.0),
+        //   margin: EdgeInsets.all(30.0),
+        //   color: Colors.grey[400],
+        //   child: Text('hello'),
+        // ),
+        body: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Text('Hello,'),
+                Text(' world'),
+              ],
+            ),
+            Container(
+              padding: EdgeInsets.all(20.0),
+              color: Colors.cyan,
+              child: Text('one'),
+            ),
+            Container(
+              padding: EdgeInsets.all(30.0),
+              color: Colors.pinkAccent,
+              child: Text('twon'),
+            ),
+            Container(
+              padding: EdgeInsets.all(40.0),
+              color: Colors.amber,
+              child: Text('three'),
+            ),
+          ],
+        ));
   }
 }
