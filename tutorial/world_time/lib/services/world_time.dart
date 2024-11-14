@@ -8,6 +8,8 @@ class WorldTime {
   String flag; // url to an asset flag icon
   String url; // location url for api endpoint
 
+  late bool isDaytime; // true or false if daytime or not
+
   WorldTime({required this.location, required this.flag, required this.url});
 
   Future<void> getTime() async {
@@ -24,6 +26,8 @@ class WorldTime {
       DateTime now = DateTime.parse(datetime);
 
       // set the time property
+      isDaytime = 6 < now.hour && now.hour < 20 ? true : false;
+
       time = DateFormat.jm().format(now);
     } catch (e) {
       print('caught error: $e');
