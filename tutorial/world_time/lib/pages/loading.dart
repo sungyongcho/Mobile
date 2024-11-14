@@ -10,24 +10,26 @@ class Loading extends StatefulWidget {
 }
 
 class _LoadingState extends State<Loading> {
-  void getData() async {
-    // https://jsonplaceholder.typicode.com/
-
-    //simulate network request for a username
-    Response response =
-        await get(Uri.parse('https://jsonplaceholder.typicode.com/todos/1'));
+  void getTime() async {
+    Response response = await get(Uri.parse(
+        'https://timeapi.io/api/time/current/zone?timeZone=Europe%2FParis'));
     Map data = jsonDecode(response.body);
 
-    print(data);
-    print(data['title']);
+    // get properties from data
+    String datetime = data['dateTime'];
+    // no need as using diff. api - String offset = data['offset'].substring(1, 3);
+    // print(datetime);
 
-    //simulate network request to get bio of the username
+    // create DateTime object
+    DateTime now = DateTime.parse(datetime);
+    // no need as using diff. api - now.add(Duration(hours: int.parse(offset)));
+    print(now);
   }
 
   @override
   void initState() {
     super.initState();
-    getData();
+    getTime();
   }
 
   @override
