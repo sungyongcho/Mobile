@@ -13,6 +13,8 @@ class WorldTime {
     try {
       // TODO: need to fix
       Response response = await get(
+          // To test error:
+          // Uri.parse('https://timeapi.io/api/time/current/zone?timeZones=$url'));
           Uri.parse('https://timeapi.io/api/time/current/zone?timeZone=$url'));
       Map data = jsonDecode(response.body);
 
