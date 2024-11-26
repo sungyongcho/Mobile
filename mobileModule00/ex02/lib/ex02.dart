@@ -17,16 +17,10 @@ class Ex02App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
-    // Determine if the device is in portrait mode
     final bool isPortrait = screenSize.height > screenSize.width;
 
-    // Determine if the device is a tablet
-
-    // Adjust UI dimensions based on conditions
-    final double buttonPadding =
-        (isPortrait ? 10.0 : 10.0); // Smaller for mobiles
-    final double buttonFontSize =
-        (isPortrait ? 20.0 : 22.0); // Smaller font size for mobile
+    final double buttonPadding = (isPortrait ? 10.0 : 10.0);
+    final double buttonFontSize = (isPortrait ? 20.0 : 22.0);
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 101, 125, 139),
