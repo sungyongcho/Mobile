@@ -17,13 +17,10 @@ class Ex02App extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final Size screenSize = MediaQuery.of(context).size;
-    final double devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
-
     // Determine if the device is in portrait mode
     final bool isPortrait = screenSize.height > screenSize.width;
 
     // Determine if the device is a tablet
-    final bool isTablet = (screenSize.shortestSide / devicePixelRatio) >= 600;
 
     // Adjust UI dimensions based on conditions
     final double buttonPadding =
