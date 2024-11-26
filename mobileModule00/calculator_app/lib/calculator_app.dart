@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart';
 
 void main() {
   runApp(const MaterialApp(home: CalculatorApp()));
@@ -11,8 +12,26 @@ class ButtonData {
   ButtonData(this.label, this.color);
 }
 
-class CalculatorApp extends StatelessWidget {
+class CalculatorApp extends StatefulWidget {
   const CalculatorApp({super.key});
+
+  @override
+  State<CalculatorApp> createState() => _CalculatorAppState();
+}
+
+class _CalculatorAppState extends State<CalculatorApp> {
+  String _expression = '0';
+  String _result = '0';
+
+  final TextEditingController _expressionController = TextEditingController();
+  final TextEditingController _resultController = TextEditingController();
+
+  @override
+  void dispose() {
+    _expressionController.dispose();
+    _resultController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,7 +60,8 @@ class CalculatorApp extends StatelessWidget {
               child: Column(
                 children: <Widget>[
                   TextField(
-                    controller: TextEditingController(text: '0'),
+                    controller: _expressionController,
+                    readOnly: true,
                     textAlign: TextAlign.right,
                     decoration: const InputDecoration(
                       border: InputBorder.none,
@@ -52,7 +72,8 @@ class CalculatorApp extends StatelessWidget {
                     ),
                   ),
                   TextField(
-                    controller: TextEditingController(text: '0'),
+                    controller: _resultController,
+                    readOnly: true,
                     textAlign: TextAlign.right,
                     decoration: const InputDecoration(
                       border: InputBorder.none,
@@ -87,14 +108,14 @@ class CalculatorApp extends StatelessWidget {
                       ButtonData('5', Colors.black),
                       ButtonData('6', Colors.black),
                       ButtonData('+', Colors.white),
-                      ButtonData('.', Colors.white),
+                      ButtonData('-', Colors.white),
                     ], buttonPadding, buttonFontSize),
                     buildButtonRow([
                       ButtonData('1', Colors.black),
                       ButtonData('2', Colors.black),
                       ButtonData('3', Colors.black),
                       ButtonData('x', Colors.white),
-                      ButtonData('=', Colors.white),
+                      ButtonData('/', Colors.white),
                     ], buttonPadding, buttonFontSize),
                     buildButtonRow([
                       ButtonData('0', Colors.black),
@@ -113,6 +134,41 @@ class CalculatorApp extends StatelessWidget {
     );
   }
 
+  void onButtonPressed(String buttonText) {
+    setState(() {
+      if (buttonText == 'C') {
+        // Delete the last character
+        if (_expression.isNotEmpty) {
+          _expression = _expression.substring(0, _expression.length - 1);
+        }
+      } else if (buttonText == 'AC') {
+        // Clear the expression and result
+        _expression = '';
+        _result = '';
+      } else if (buttonText == '=') {
+        // Evaluate the expression
+        try {
+          Parser p = Parser();
+          String expString =
+              _expression.replaceAll('x', '*').replaceAll('÷', '/');
+          Expression exp = p.parse(expString);
+          ContextModel cm = ContextModel();
+          double eval = exp.evaluate(EvaluationType.REAL, cm);
+          _result = eval.toString();
+        } catch (e) {
+          _result = 'Error';
+        }
+      } else {
+        // Append the button text to the expression
+        _expression += buttonText;
+      }
+
+      // Update the controllers
+      _expressionController.text = _expression;
+      _resultController.text = _result;
+    });
+  }
+
   Row buildButtonRow(
       List<ButtonData> buttonDataList, double padding, double fontSize) {
     return Row(
@@ -120,13 +176,12 @@ class CalculatorApp extends StatelessWidget {
       children: buttonDataList.map((buttonData) {
         return TextButton(
           onPressed: () {
-            debugPrint('Button pressed: ${buttonData.label}');
+            onButtonPressed(buttonData.label);
           },
           style: TextButton.styleFrom(
-            padding: EdgeInsets.zero, // Remove padding to align text properly
-            minimumSize:
-                Size(padding, padding), // Ensure consistent button size
-            alignment: Alignment.center, // Center-align text
+            padding: EdgeInsets.zero,
+            minimumSize: Size(padding, padding),
+            alignment: Alignment.center,
           ),
           child: Text(
             buttonData.label,
