@@ -4,9 +4,16 @@ void main() {
   runApp(const MaterialApp(home: Ex01App()));
 }
 
-class Ex01App extends StatelessWidget {
+class Ex01App extends StatefulWidget {
   const Ex01App({super.key});
 
+  @override
+  State<Ex01App> createState() => _Ex01AppState();
+}
+
+class _Ex01AppState extends State<Ex01App> {
+  String displayedText = 'A Simple text';
+  bool isOriginalText = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -37,7 +44,7 @@ class Ex01App extends StatelessWidget {
                         BorderRadius.all(Radius.circular(8)), // Rounded corners
                   ),
                   child: Text(
-                    'A Simple text',
+                    displayedText,
                     style: TextStyle(
                       fontSize: fontSize,
                       color: Colors.white,
@@ -54,7 +61,15 @@ class Ex01App extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    debugPrint('Button pressed');
+                    // Update the state to toggle text
+                    setState(() {
+                      if (isOriginalText) {
+                        displayedText = 'Hello World';
+                      } else {
+                        displayedText = 'A Simple text';
+                      }
+                      isOriginalText = !isOriginalText;
+                    });
                   },
                   child: Text(
                     'click me',
