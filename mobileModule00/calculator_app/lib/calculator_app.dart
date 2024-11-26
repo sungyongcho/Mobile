@@ -115,7 +115,7 @@ class _CalculatorAppState extends State<CalculatorApp> {
                       ButtonData('2', Colors.black),
                       ButtonData('3', Colors.black),
                       ButtonData('x', Colors.white),
-                      ButtonData('/', Colors.white),
+                      ButtonData('÷', Colors.white),
                     ], buttonPadding, buttonFontSize),
                     buildButtonRow([
                       ButtonData('0', Colors.black),
@@ -140,11 +140,14 @@ class _CalculatorAppState extends State<CalculatorApp> {
         // Delete the last character
         if (_expression.isNotEmpty) {
           _expression = _expression.substring(0, _expression.length - 1);
+          if (_expression.isEmpty) {
+            _expression = '0';
+          }
         }
       } else if (buttonText == 'AC') {
         // Clear the expression and result
-        _expression = '';
-        _result = '';
+        _expression = '0';
+        _result = '0';
       } else if (buttonText == '=') {
         // Evaluate the expression
         try {
@@ -159,11 +162,19 @@ class _CalculatorAppState extends State<CalculatorApp> {
           _result = 'Error';
         }
       } else {
-        // Append the button text to the expression
-        _expression += buttonText;
+        if (_expression == '0') {
+          if (buttonText == '.' || '+-x÷'.contains(buttonText)) {
+            _expression += buttonText;
+          } else if ('0123456789'.contains(buttonText)) {
+            _expression = buttonText;
+          } else {
+            _expression = buttonText;
+          }
+        } else {
+          _expression += buttonText;
+        }
       }
 
-      // Update the controllers
       _expressionController.text = _expression;
       _resultController.text = _result;
     });
