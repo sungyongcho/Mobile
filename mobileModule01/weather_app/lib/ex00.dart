@@ -48,9 +48,10 @@ class _Ex00HomeState extends State<Ex00Home>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(onPressed: () {}, icon: Icon(Icons.search)),
         title: const TextField(
           decoration: InputDecoration(
-            hintText: 'Search',
+            hintText: 'Search location..',
             border: InputBorder.none,
             hintStyle: TextStyle(color: Colors.white70),
           ),
@@ -59,13 +60,13 @@ class _Ex00HomeState extends State<Ex00Home>
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.my_location),
+            icon: const Icon(Icons.location_pin),
             onPressed: () {
               // Handle geolocation button press
             },
           ),
         ],
-        backgroundColor: Colors.blue,
+        backgroundColor: Color.fromARGB(255, 92, 93, 114),
       ),
       body: TabBarView(
         controller: _tabController,
@@ -82,7 +83,7 @@ class _Ex00HomeState extends State<Ex00Home>
             .toList(),
       ),
       bottomNavigationBar: BottomAppBar(
-        color: Colors.blue,
+        color: Color.fromARGB(255, 92, 93, 114),
         child: SizedBox(
           height: 56.0,
           child: Row(
