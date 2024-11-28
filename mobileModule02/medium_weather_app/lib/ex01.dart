@@ -34,6 +34,7 @@ class _Ex01HomeState extends State<Ex01Home> with TickerProviderStateMixin {
   double? longitude;
   String? error;
   List<dynamic> suggestions = []; // List to store suggestions
+  String temperature = 'Loading';
 
   @override
   void initState() {
@@ -93,10 +94,10 @@ class _Ex01HomeState extends State<Ex01Home> with TickerProviderStateMixin {
       return;
     }
 
-    final url =
+    final cityUrl =
         'https://geocoding-api.open-meteo.com/v1/search?name=$query&count=5';
     try {
-      final response = await http.get(Uri.parse(url));
+      final response = await http.get(Uri.parse(cityUrl));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         setState(() {
@@ -111,6 +112,33 @@ class _Ex01HomeState extends State<Ex01Home> with TickerProviderStateMixin {
       setState(() {
         suggestions = [];
       });
+    }
+  }
+
+  Future<void> fetchWeather(double latitude, double longitude) async {
+    final weatherUrl =
+        'https://api.open-meteo.com/v1/forecast?latitude=$latitude&longitude=$longitude&current=temperature_2m';
+    try {
+      final response = await http.get(Uri.parse(weatherUrl));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+
+        // Parse the temperature and unit
+        final current = data['current'];
+        final temperatureValue = current['temperature_2m'];
+        final temperatureUnit = data['current_units']['temperature_2m'];
+
+        // Store them in the `temperature` string
+        setState(() {
+          temperature = "$temperatureValue $temperatureUnit";
+        });
+
+        print(temperature); // For debugging
+      } else {
+        print("Failed to fetch weather data: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Error fetching weather data: $e");
     }
   }
 
@@ -180,6 +208,7 @@ class _Ex01HomeState extends State<Ex01Home> with TickerProviderStateMixin {
               itemCount: suggestions.length,
               itemBuilder: (context, index) {
                 final suggestion = suggestions[index];
+
                 return ListTile(
                   title: Text(
                     suggestion['name'] ?? 'Unknown City',
@@ -193,7 +222,12 @@ class _Ex01HomeState extends State<Ex01Home> with TickerProviderStateMixin {
                     setState(() {
                       value = suggestion['name'];
                       suggestions = [];
-                      _inputController.text = suggestion['name'];
+                      // _inputController.text = suggestion['name'];
+                      fetchWeather(
+                          suggestion['latitude'], suggestion['longitude']);
+                      latitude = suggestion['latitude'];
+                      longitude = suggestion['longitude'];
+                      _inputController.text = '';
                     });
                   },
                 );
@@ -232,6 +266,14 @@ class _Ex01HomeState extends State<Ex01Home> with TickerProviderStateMixin {
                                       0.02), // Responsive spacing
                               Text(
                                 value,
+                                style: TextStyle(
+                                  fontSize: screenWidth *
+                                      0.08, // Responsive font size
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                temperature,
                                 style: TextStyle(
                                   fontSize: screenWidth *
                                       0.08, // Responsive font size
