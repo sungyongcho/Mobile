@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:medium_weather_app/data/current_weather_data.dart';
 import 'package:medium_weather_app/data/today_weather_data.dart';
+import 'package:medium_weather_app/data/weekly_weather_data.dart';
 
 class WeatherService {
   final Map _weatherMap = {
@@ -66,6 +67,33 @@ class WeatherService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       return TodayWeatherData.fromJson(data);
+    }
+
+    return Future.error(
+        "The service connection is lost, please check your internet connection or try again later");
+  }
+
+  Future<WeeklyWeatherData> fetchWeeklyWeatherData(
+      double latitude, double longitude) async {
+    final weeklyUrl =
+        'https://api.open-meteo.com/v1/forecast?latitude=$latitude&longitude=$longitude&daily=weathercode,temperature_2m_max,temperature_2m_min';
+    final response = await http.get(Uri.parse(weeklyUrl));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      // Map weather codes to their descriptions
+      final List<int> rawWeatherCodes =
+          List<int>.from(data['daily']['weathercode']?.cast<int>() ?? []);
+      final List<String> mappedWeatherDescriptions = rawWeatherCodes
+          .map((code) => _weatherMap[code]?.toString() ?? 'Unknown')
+          .toList();
+
+      return WeeklyWeatherData.fromJson(
+        data,
+        weatherDescriptions:
+            mappedWeatherDescriptions, // Pass mapped descriptions
+      );
     }
 
     return Future.error(

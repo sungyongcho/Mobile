@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:medium_weather_app/data/location_data.dart';
 import 'package:medium_weather_app/data/today_weather_data.dart';
+import 'package:medium_weather_app/data/weekly_weather_data.dart';
 import 'package:medium_weather_app/services/weather_service.dart';
 import 'package:medium_weather_app/data/current_weather_data.dart';
 import 'package:http/http.dart' as http;
@@ -42,6 +43,7 @@ class _WeatherHomeState extends State<WeatherHome>
   LocationData? locationData;
   CurrentWeatherData? currentWeatherData;
   TodayWeatherData? todayWeatherData;
+  WeeklyWeatherData? weeklyWeatherData;
 
   @override
   void initState() {
@@ -123,9 +125,12 @@ class _WeatherHomeState extends State<WeatherHome>
       );
       final weatherDataForToday = await _weatherService.fetchTodayWeatherData(
           locationData!.latitude, locationData!.longitude);
+      final weatherDataForWeekly = await _weatherService.fetchWeeklyWeatherData(
+          locationData!.latitude, locationData!.longitude);
       setState(() {
         currentWeatherData = weatherDataForCurrent;
         todayWeatherData = weatherDataForToday;
+        weeklyWeatherData = weatherDataForWeekly;
       });
     } catch (e) {
       _setErrorState('Error fetching weather data: $e');
@@ -241,7 +246,7 @@ class _WeatherHomeState extends State<WeatherHome>
       children: [
         _buildCurrentWeather(),
         _buildTodayWeather(),
-        _buildPlaceholder('Weekly'),
+        _buildWeeklyWeather(),
       ],
     );
   }
@@ -299,6 +304,36 @@ class _WeatherHomeState extends State<WeatherHome>
 
             return Text(
               '$time  $temperature°C  $windSpeed km/h',
+              style: _todayWeatherListStyle,
+            );
+          }).toList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWeeklyWeather() {
+    if (currentWeatherData == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(locationData?.city ?? 'N/A', style: _textStyle),
+          Text(locationData?.region ?? 'N/A', style: _textStyle),
+          Text(locationData?.country ?? 'N/A', style: _textStyle),
+          ...weeklyWeatherData!.time.asMap().entries.map((entry) {
+            final index = entry.key;
+            final time = entry.value;
+            final temperatureMin = weeklyWeatherData!.temperatureMin[index];
+            final temperatureMax = weeklyWeatherData!.temperatureMax[index];
+            final weatherDescription =
+                weeklyWeatherData!.weatherDescriptions[index];
+
+            return Text(
+              '$time  $temperatureMin°C $temperatureMax  $weatherDescription',
               style: _todayWeatherListStyle,
             );
           }).toList(),
