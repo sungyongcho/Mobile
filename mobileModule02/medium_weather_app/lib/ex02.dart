@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:medium_weather_app/data/location_data.dart';
+import 'package:medium_weather_app/data/today_weather_data.dart';
 import 'package:medium_weather_app/services/weather_service.dart';
 import 'package:medium_weather_app/data/current_weather_data.dart';
 import 'package:http/http.dart' as http;
@@ -40,6 +41,7 @@ class _WeatherHomeState extends State<WeatherHome>
   List<dynamic> suggestions = [];
   LocationData? locationData;
   CurrentWeatherData? currentWeatherData;
+  TodayWeatherData? todayWeatherData;
 
   @override
   void initState() {
@@ -114,12 +116,16 @@ class _WeatherHomeState extends State<WeatherHome>
     if (locationData == null) return;
 
     try {
-      final weatherData = await _weatherService.fetchCurrentWeatherData(
+      final weatherDataForCurrent =
+          await _weatherService.fetchCurrentWeatherData(
         locationData!.latitude,
         locationData!.longitude,
       );
+      final weatherDataForToday = await _weatherService.fetchTodayWeatherData(
+          locationData!.latitude, locationData!.longitude);
       setState(() {
-        currentWeatherData = weatherData;
+        currentWeatherData = weatherDataForCurrent;
+        todayWeatherData = weatherDataForToday;
       });
     } catch (e) {
       _setErrorState('Error fetching weather data: $e');
@@ -219,6 +225,10 @@ class _WeatherHomeState extends State<WeatherHome>
               suggestion['longitude'],
             );
             await _fetchWeatherData();
+            setState(() {
+              searchValue = '';
+              _inputController.text = '';
+            });
           },
         );
       },
@@ -230,7 +240,7 @@ class _WeatherHomeState extends State<WeatherHome>
       controller: _tabController,
       children: [
         _buildCurrentWeather(),
-        _buildPlaceholder('Today'),
+        _buildTodayWeather(),
         _buildPlaceholder('Weekly'),
       ],
     );
@@ -264,6 +274,34 @@ class _WeatherHomeState extends State<WeatherHome>
             'Wind Speed: ${currentWeatherData?.windSpeed ?? 'N/A'} m/s',
             style: _textStyle,
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTodayWeather() {
+    if (currentWeatherData == null) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(locationData?.city ?? 'N/A', style: _textStyle),
+          Text(locationData?.region ?? 'N/A', style: _textStyle),
+          Text(locationData?.country ?? 'N/A', style: _textStyle),
+          ...todayWeatherData!.time.asMap().entries.map((entry) {
+            final index = entry.key;
+            final time = entry.value;
+            final temperature = todayWeatherData!.temperature[index];
+            final windSpeed = todayWeatherData!.windSpeed[index];
+
+            return Text(
+              '$time  $temperature°C  $windSpeed km/h',
+              style: _todayWeatherListStyle,
+            );
+          }).toList(),
         ],
       ),
     );
@@ -335,5 +373,8 @@ class _WeatherHomeState extends State<WeatherHome>
   TextStyle get _textStyle => const TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.bold,
+      );
+  TextStyle get _todayWeatherListStyle => const TextStyle(
+        fontSize: 14,
       );
 }

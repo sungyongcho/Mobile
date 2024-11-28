@@ -2,6 +2,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:medium_weather_app/data/current_weather_data.dart';
+import 'package:medium_weather_app/data/today_weather_data.dart';
 
 class WeatherService {
   final Map _weatherMap = {
@@ -37,14 +38,12 @@ class WeatherService {
 
   Future<CurrentWeatherData> fetchCurrentWeatherData(
       double latitude, double longitude) async {
-    print(latitude + longitude);
-    final weatherUrl =
+    final url =
         'https://api.open-meteo.com/v1/forecast?latitude=$latitude&longitude=$longitude&current=temperature_2m,weather_code,wind_speed_10m';
-    final response = await http.get(Uri.parse(weatherUrl));
+    final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      print(data);
       return CurrentWeatherData(
         latitude: data['latitude'],
         longitude: data['longitude'],
@@ -52,6 +51,21 @@ class WeatherService {
         weather: _weatherMap[data['current']['weather_code']],
         windSpeed: data['current']['wind_speed_10m'],
       );
+    }
+
+    return Future.error(
+        "The service connection is lost, please check your internet connection or try again later");
+  }
+
+  Future<TodayWeatherData> fetchTodayWeatherData(
+      double latitude, double longitude) async {
+    final todayUrl =
+        'https://api.open-meteo.com/v1/forecast?latitude=$latitude&longitude=$longitude&hourly=temperature_2m,weather_code,wind_speed_10m&forecast_days=1';
+    final response = await http.get(Uri.parse(todayUrl));
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return TodayWeatherData.fromJson(data);
     }
 
     return Future.error(
