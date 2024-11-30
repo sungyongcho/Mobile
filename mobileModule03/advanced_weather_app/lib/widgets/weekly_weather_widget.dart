@@ -133,8 +133,8 @@ class WeeklyWeatherWidget extends StatelessWidget {
   }
 
   Widget _buildLegend() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0),
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -145,8 +145,8 @@ class WeeklyWeatherWidget extends StatelessWidget {
                 size: 10,
                 color: Colors.green, // Color for Min temperature
               ),
-              const SizedBox(width: 4),
-              const Text(
+              SizedBox(width: 4),
+              Text(
                 "Min temperature",
                 style: TextStyle(
                   color: Colors.white,
@@ -155,7 +155,7 @@ class WeeklyWeatherWidget extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(width: 16), // Spacing between the legends
+          SizedBox(width: 16), // Spacing between the legends
           Row(
             children: [
               Icon(
@@ -163,8 +163,8 @@ class WeeklyWeatherWidget extends StatelessWidget {
                 size: 10,
                 color: Colors.red, // Color for Max temperature
               ),
-              const SizedBox(width: 4),
-              const Text(
+              SizedBox(width: 4),
+              Text(
                 "Max temperature",
                 style: TextStyle(
                   color: Colors.white,
@@ -249,11 +249,11 @@ class WeeklyWeatherWidget extends StatelessWidget {
                       (maxX - minX) / 6, // Dynamic vertical interval
                   horizontalInterval:
                       (maxY - minY) / 6, // Dynamic horizontal interval
-                  getDrawingHorizontalLine: (value) => FlLine(
+                  getDrawingHorizontalLine: (value) => const FlLine(
                     color: Colors.white30,
                     strokeWidth: 1,
                   ),
-                  getDrawingVerticalLine: (value) => FlLine(
+                  getDrawingVerticalLine: (value) => const FlLine(
                     color: Colors.white30,
                     strokeWidth: 1,
                   ),
@@ -300,12 +300,6 @@ class WeeklyWeatherWidget extends StatelessWidget {
                         }
                       },
                     ),
-                  ),
-                  topTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
-                  ),
-                  rightTitles: AxisTitles(
-                    sideTitles: SideTitles(showTitles: false),
                   ),
                 ),
                 borderData: FlBorderData(
