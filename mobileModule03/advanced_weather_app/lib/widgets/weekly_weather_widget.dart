@@ -27,9 +27,11 @@ class WeeklyWeatherWidget extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(locationData?.city ?? 'N/A', style: _textStyle),
-          Text(locationData?.region ?? 'N/A', style: _textStyle),
-          Text(locationData?.country ?? 'N/A', style: _textStyle),
+          Text(locationData?.city ?? 'N/A', style: _cityTextStyle),
+          Text(
+            '${locationData?.region}, ${locationData?.country}' ?? 'N/A',
+            style: _textStyle,
+          ),
           ...weeklyWeatherData!.time.asMap().entries.map((entry) {
             final index = entry.key;
             final time = entry.value;
@@ -52,5 +54,11 @@ class WeeklyWeatherWidget extends StatelessWidget {
         fontSize: 16,
         fontWeight: FontWeight.bold,
         color: Colors.white,
+      );
+
+  TextStyle get _cityTextStyle => TextStyle(
+        fontSize: 16,
+        fontWeight: FontWeight.bold,
+        color: Colors.amber[800],
       );
 }

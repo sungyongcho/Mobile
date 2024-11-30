@@ -201,21 +201,21 @@ class _WeatherHomeState extends State<WeatherHome>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: _buildAppBar(),
-      body: Stack(children: [
-        Positioned.fill(
-          child: Image.asset(
-            'assets/image.png', // Path to your image
+      body: Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage('assets/image.png'), // Path to your image
             fit: BoxFit.cover, // Ensures the image covers the entire background
           ),
         ),
-        searchValue.isNotEmpty
+        child: searchValue.isNotEmpty
             ? suggestions.isNotEmpty
                 ? _buildSuggestionsList()
                 : _buildErrorView()
             : error == null
                 ? _buildTabBarView()
                 : _buildErrorView(),
-      ]),
+      ),
       bottomNavigationBar: _buildBottomAppBar(),
     );
   }
@@ -244,7 +244,7 @@ class _WeatherHomeState extends State<WeatherHome>
       ),
       actions: [
         // Add the VerticalDivider here
-        Padding(
+        const Padding(
           padding: EdgeInsets.symmetric(vertical: 8.0),
           child: VerticalDivider(
             color: Colors.white70,
@@ -370,18 +370,6 @@ class _WeatherHomeState extends State<WeatherHome>
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 20),
-          // ElevatedButton(
-          //   onPressed: () {
-          //     if (searchValue.isNotEmpty) {
-          //       _fetchSuggestions(searchValue);
-          //     } else if (locationData != null) {
-          //       _fetchWeatherData();
-          //     } else {
-          //       _fetchCurrentLocation();
-          //     }
-          //   },
-          //   child: const Text('Retry'),
-          // ),
         ],
       ),
     );
@@ -438,12 +426,4 @@ class _WeatherHomeState extends State<WeatherHome>
 
   TextStyle get _textStyle => const TextStyle(
       fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white);
-  TextStyle get _cityTextStyle => TextStyle(
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
-        color: Colors.amber[800],
-      );
-  TextStyle get _todayWeatherListStyle => const TextStyle(
-        fontSize: 14,
-      );
 }
