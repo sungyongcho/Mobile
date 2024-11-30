@@ -1,9 +1,11 @@
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 import 'package:advanced_weather_app/data/current_weather_data.dart';
 import 'package:advanced_weather_app/data/today_weather_data.dart';
 import 'package:advanced_weather_app/data/weekly_weather_data.dart';
+import 'package:weather_icons/weather_icons.dart';
 
 class WeatherService {
   final Map _weatherMap = {
@@ -35,6 +37,36 @@ class WeatherService {
     95: 'Slight Thunderstorm',
     96: 'Thunderstorm with slight hail',
     99: 'Thunderstorm with heavy hail'
+  };
+
+  final Map<String, IconData> _weatherIcons = {
+    'Sunny': WeatherIcons.day_sunny,
+    'Mainly Clear': WeatherIcons.day_cloudy,
+    'Partly Sunny': WeatherIcons.day_sunny_overcast,
+    'Overcast': WeatherIcons.cloudy,
+    'Foggy': WeatherIcons.fog,
+    'Light Drizzle': WeatherIcons.raindrops,
+    'Moderate Drizzle': WeatherIcons.raindrops,
+    'Dense Drizzle': WeatherIcons.raindrops,
+    'Light Freezing Drizzle': WeatherIcons.snowflake_cold,
+    'Dense Freezing Drizzle': WeatherIcons.snowflake_cold,
+    'Slightly Rainy': WeatherIcons.raindrop,
+    'Moderately Rainy': WeatherIcons.rain,
+    'Heavily Rainy': WeatherIcons.rain_wind,
+    'Light Freezing Rainy': WeatherIcons.snowflake_cold,
+    'Heavy Freezing Rainy': WeatherIcons.snowflake_cold,
+    'Slightly Snowy': WeatherIcons.snow,
+    'Moderately Snowy': WeatherIcons.snow,
+    'Heavily Snowy': WeatherIcons.snow,
+    'Snowy': WeatherIcons.snow,
+    'Slight Rain Shower': WeatherIcons.showers,
+    'Moderate Rain Shower': WeatherIcons.showers,
+    'Violent Rain Shower': WeatherIcons.storm_showers,
+    'Slight Snow Shower': WeatherIcons.snow,
+    'Violent Snow Shower': WeatherIcons.snow_wind,
+    'Slight Thunderstorm': WeatherIcons.thunderstorm,
+    'Thunderstorm with slight hail': WeatherIcons.storm_showers,
+    'Thunderstorm with heavy hail': WeatherIcons.storm_showers,
   };
 
   Future<CurrentWeatherData> fetchCurrentWeatherData(
@@ -112,5 +144,9 @@ class WeatherService {
       throw Exception(
           "The service connection is lost, please check your internet connection or try again later");
     }
+  }
+
+  IconData? getWeatherIcon(String? weatherDescription) {
+    return _weatherIcons[weatherDescription] ?? Icons.help_outline;
   }
 }

@@ -345,24 +345,40 @@ class _WeatherHomeState extends State<WeatherHome>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(locationData?.city ?? 'N/A', style: _textStyle),
-          Text(locationData?.region ?? 'N/A', style: _textStyle),
-          Text(locationData?.country ?? 'N/A', style: _textStyle),
+          Text(locationData?.city ?? 'N/A', style: _cityTextStyle),
+          Text('${locationData?.region}, ${locationData?.country}' ?? 'N/A',
+              style: _textStyle),
+          SizedBox(height: 40),
           Text(
-            '${locationData?.latitude.toStringAsFixed(4)} ${locationData?.longitude.toStringAsFixed(4)}',
-            style: _textStyle,
+            '${currentWeatherData?.temperature ?? 'N/A'}°C',
+            style: TextStyle(fontSize: 48, color: Colors.yellow[800]),
           ),
+          SizedBox(height: 40),
           Text(
-            'Temperature: ${currentWeatherData?.temperature ?? 'N/A'}°C',
-            style: _textStyle,
+            '${currentWeatherData?.weather ?? 'N/A'}',
+            style: TextStyle(fontSize: 16, color: Colors.white),
           ),
-          Text(
-            'Weather: ${currentWeatherData?.weather ?? 'N/A'}',
-            style: _textStyle,
+          Icon(
+            _weatherService.getWeatherIcon(currentWeatherData?.weather),
+            size: 64,
+            color: Colors.yellow[800],
           ),
-          Text(
-            'Wind Speed: ${currentWeatherData?.windSpeed ?? 'N/A'} m/s',
-            style: _textStyle,
+          SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.air,
+                color: Colors.yellow[800],
+                size: 24,
+              ),
+              const SizedBox(
+                  width: 8), // Add some spacing between the icon and text
+              Text(
+                '${currentWeatherData?.windSpeed ?? 'N/A'} km/h',
+                style: _textStyle,
+              ),
+            ],
           ),
         ],
       ),
@@ -511,8 +527,11 @@ class _WeatherHomeState extends State<WeatherHome>
   }
 
   TextStyle get _textStyle => const TextStyle(
+      fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white);
+  TextStyle get _cityTextStyle => TextStyle(
         fontSize: 16,
         fontWeight: FontWeight.bold,
+        color: Colors.amber[800],
       );
   TextStyle get _todayWeatherListStyle => const TextStyle(
         fontSize: 14,
