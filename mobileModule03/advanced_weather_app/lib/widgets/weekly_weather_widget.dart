@@ -37,20 +37,9 @@ class WeeklyWeatherWidget extends StatelessWidget {
             style: _textStyle.copyWith(fontSize: responsiveFontSize),
           ),
           const SizedBox(height: 50),
-          _buildHourlyWeatherList(context, responsiveFontSize)
-          // ...weeklyWeatherData!.time.asMap().entries.map((entry) {
-          //   final index = entry.key;
-          //   final time = entry.value;
-          //   final temperatureMin = weeklyWeatherData!.temperatureMin[index];
-          //   final temperatureMax = weeklyWeatherData!.temperatureMax[index];
-          //   final weatherDescription =
-          //       weeklyWeatherData!.weatherDescriptions[index];
-
-          //   return Text(
-          //     '$time  $temperatureMin°C $temperatureMax  $weatherDescription',
-          //     // style: _todayWeatherListStyle,
-          //   );
-          // }).toList(),
+          _buildDailyTemperatureGraph(context),
+          const SizedBox(height: 50),
+          _buildHourlyWeatherList(context, responsiveFontSize),
         ],
       ),
     );
@@ -140,6 +129,239 @@ class WeeklyWeatherWidget extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+
+  Widget _buildLegend() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.circle, // Use a circular icon
+                size: 10,
+                color: Colors.green, // Color for Min temperature
+              ),
+              const SizedBox(width: 4),
+              const Text(
+                "Min temperature",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(width: 16), // Spacing between the legends
+          Row(
+            children: [
+              Icon(
+                Icons.circle, // Use a circular icon
+                size: 10,
+                color: Colors.red, // Color for Max temperature
+              ),
+              const SizedBox(width: 4),
+              const Text(
+                "Max temperature",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 12,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDailyTemperatureGraph(BuildContext context) {
+    final spotsMin = weeklyWeatherData!.time.asMap().entries.map((entry) {
+      final index = entry.key;
+      return FlSpot(
+        index.toDouble(),
+        weeklyWeatherData!.temperatureMin[index],
+      );
+    }).toList();
+
+    final spotsMax = weeklyWeatherData!.time.asMap().entries.map((entry) {
+      final index = entry.key;
+      return FlSpot(
+        index.toDouble(),
+        weeklyWeatherData!.temperatureMax[index],
+      );
+    }).toList();
+
+    final rawMinY = min(
+      weeklyWeatherData!.temperatureMin.reduce(min),
+      weeklyWeatherData!.temperatureMax.reduce(min),
+    );
+
+    final rawMaxY = max(
+      weeklyWeatherData!.temperatureMin.reduce(max),
+      weeklyWeatherData!.temperatureMax.reduce(max),
+    );
+
+// Adjust minY and maxY to nearest multiples of 5
+    final minY = (rawMinY / 5).floor() * 5.0; // Round down to nearest 5
+    final maxY = (rawMaxY / 5).ceil() * 5.0; // Round up to nearest 5
+
+    final minX = 0.0;
+    final maxX = (weeklyWeatherData!.time.length - 1).toDouble();
+
+    // Responsive graph height based on screen height
+    final screenHeight = MediaQuery.of(context).size.height;
+    final graphHeight = screenHeight * 0.3; // Adjust height proportionally
+
+    return Column(
+      children: [
+        Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
+            child: Text(
+              "Weekly Temperatures",
+              style: TextStyle(
+                fontSize: MediaQuery.of(context).size.width * 0.05,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ),
+        ),
+        SizedBox(
+          height: graphHeight,
+          width: double.infinity,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: LineChart(
+              LineChartData(
+                minX: minX,
+                maxX: maxX,
+                minY: minY,
+                maxY: maxY,
+                gridData: FlGridData(
+                  show: true,
+                  drawVerticalLine: true,
+                  verticalInterval:
+                      (maxX - minX) / 6, // Dynamic vertical interval
+                  horizontalInterval:
+                      (maxY - minY) / 6, // Dynamic horizontal interval
+                  getDrawingHorizontalLine: (value) => FlLine(
+                    color: Colors.white30,
+                    strokeWidth: 1,
+                  ),
+                  getDrawingVerticalLine: (value) => FlLine(
+                    color: Colors.white30,
+                    strokeWidth: 1,
+                  ),
+                ),
+                titlesData: FlTitlesData(
+                  leftTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      interval: (maxY - minY) / 6, // Match horizontal interval
+                      reservedSize: 40,
+                      getTitlesWidget: (value, meta) {
+                        return Text(
+                          '${value.toInt()}°C',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                  bottomTitles: AxisTitles(
+                    sideTitles: SideTitles(
+                      showTitles: true,
+                      interval: 1,
+                      reservedSize: 30,
+                      getTitlesWidget: (value, meta) {
+                        final int index = value.toInt();
+                        if (index >= 0 &&
+                            index < weeklyWeatherData!.time.length) {
+                          final time = weeklyWeatherData!.time[index];
+                          return SideTitleWidget(
+                            axisSide: meta.axisSide,
+                            child: Text(
+                              time,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                              ),
+                            ),
+                          );
+                        } else {
+                          return Container();
+                        }
+                      },
+                    ),
+                  ),
+                  topTitles: AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                  rightTitles: AxisTitles(
+                    sideTitles: SideTitles(showTitles: false),
+                  ),
+                ),
+                borderData: FlBorderData(
+                  show: true,
+                  border: Border.all(color: Colors.white30, width: 1),
+                ),
+                lineBarsData: [
+                  // Line for temperatureMin
+                  LineChartBarData(
+                    spots: spotsMin,
+                    isCurved: true,
+                    color: Colors.green, // Adjust color for clarity
+                    barWidth: 3,
+                    isStrokeCapRound: true,
+                    belowBarData: BarAreaData(
+                      show: false,
+                    ),
+                    dotData: FlDotData(
+                      show: true,
+                      getDotPainter: (spot, percent, bar, index) =>
+                          FlDotCirclePainter(
+                        radius: 4,
+                        color: Colors.white,
+                        strokeWidth: 2,
+                        strokeColor: Colors.green,
+                      ),
+                    ),
+                  ),
+                  // Line for temperatureMax
+                  LineChartBarData(
+                    spots: spotsMax,
+                    isCurved: true,
+                    color: Colors.red, // Adjust color for clarity
+                    barWidth: 3,
+                    isStrokeCapRound: true,
+                    belowBarData: BarAreaData(
+                      show: false,
+                    ),
+                    dotData: FlDotData(
+                      show: true,
+                      getDotPainter: (spot, percent, bar, index) =>
+                          FlDotCirclePainter(
+                        radius: 4,
+                        color: Colors.white,
+                        strokeWidth: 2,
+                        strokeColor: Colors.red,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        _buildLegend(),
+      ],
     );
   }
 
