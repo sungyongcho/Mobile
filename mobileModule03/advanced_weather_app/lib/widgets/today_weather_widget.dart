@@ -39,7 +39,7 @@ class TodayWeatherWidget extends StatelessWidget {
             style: _textStyle.copyWith(fontSize: responsiveFontSize),
           ),
           const SizedBox(height: 50),
-          _buildTemperatureGraph(context),
+          _buildHourlyTemperatureGraph(context),
           const SizedBox(height: 40),
           _buildHourlyWeatherList(context, responsiveFontSize),
         ],
@@ -108,7 +108,7 @@ class TodayWeatherWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildTemperatureGraph(BuildContext context) {
+  Widget _buildHourlyTemperatureGraph(BuildContext context) {
     final spots = todayWeatherData!.time.asMap().entries.map((entry) {
       final index = entry.key;
       return FlSpot(
