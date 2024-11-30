@@ -104,7 +104,7 @@ class WeatherService {
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       if (data['hourly'] != null) {
-        return TodayWeatherData.fromJson(data);
+        return TodayWeatherData.fromJson(data, _weatherMap.cast<int, String>());
       } else {
         throw Exception(
             'Weather data not available for the selected location.');

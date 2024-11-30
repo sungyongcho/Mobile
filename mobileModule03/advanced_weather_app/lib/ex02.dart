@@ -385,6 +385,60 @@ class _WeatherHomeState extends State<WeatherHome>
     );
   }
 
+  Widget _buildHourlyWeatherList() {
+    return SizedBox(
+      height: 100, // Set height for the list
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: todayWeatherData!.time.length,
+        itemBuilder: (context, index) {
+          final time = todayWeatherData!.time[index];
+          final temperature = todayWeatherData!.temperature[index];
+          final windSpeed = todayWeatherData!.windSpeed[index];
+          final weather = todayWeatherData!.weather[index];
+
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  time,
+                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                ),
+                SizedBox(
+                  height: 12,
+                ),
+                Icon(
+                  _weatherService.getWeatherIcon(weather),
+                  color: Colors.yellow[800],
+                  size: 24,
+                ),
+                Text(
+                  '${temperature.toStringAsFixed(1)}°C',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.air,
+                      color: Colors.yellow[800],
+                    ),
+                    Text(
+                      '${windSpeed.toStringAsFixed(1)} km/h',
+                      style: _textStyle,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   Widget _buildTodayWeather() {
     if (currentWeatherData == null) {
       return const Center(child: CircularProgressIndicator());
@@ -394,20 +448,13 @@ class _WeatherHomeState extends State<WeatherHome>
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(locationData?.city ?? 'N/A', style: _textStyle),
-          Text(locationData?.region ?? 'N/A', style: _textStyle),
-          Text(locationData?.country ?? 'N/A', style: _textStyle),
-          ...todayWeatherData!.time.asMap().entries.map((entry) {
-            final index = entry.key;
-            final time = entry.value;
-            final temperature = todayWeatherData!.temperature[index];
-            final windSpeed = todayWeatherData!.windSpeed[index];
-
-            return Text(
-              '$time  $temperature°C  $windSpeed km/h',
-              style: _todayWeatherListStyle,
-            );
-          }).toList(),
+          Text(locationData?.city ?? 'N/A', style: _cityTextStyle),
+          Text('${locationData?.region}, ${locationData?.country}' ?? 'N/A',
+              style: _textStyle),
+          SizedBox(
+            height: 50,
+          ),
+          _buildHourlyWeatherList()
         ],
       ),
     );
