@@ -21,60 +21,89 @@ class CurrentWeatherWidget extends StatelessWidget {
       return const Center(child: CircularProgressIndicator());
     }
 
+    // Get screen dimensions
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // Responsive font sizes
+    final baseFontSize = screenWidth * 0.05; // Adjust as needed
+    final largeFontSize = screenWidth * 0.12; // Adjust as needed
+
+    // Icon size
+    final iconSize = screenWidth * 0.2; // Adjust as needed
+
+    // Spacing sizes
+    final spacingLarge = screenHeight * 0.05; // Adjust as needed
+    final spacingMedium = screenHeight * 0.03; // Adjust as needed
+    final spacingSmall = screenHeight * 0.02; // Adjust as needed
+
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(locationData?.city ?? 'N/A', style: _cityTextStyle),
-          Text(
-            '${locationData?.region}, ${locationData?.country}' ?? 'N/A',
-            style: _textStyle,
-          ),
-          const SizedBox(height: 40),
-          Text(
-            '${currentWeatherData?.temperature ?? 'N/A'}°C',
-            style: TextStyle(fontSize: 48, color: Colors.yellow[800]),
-          ),
-          const SizedBox(height: 40),
-          Text(
-            '${currentWeatherData?.weather ?? 'N/A'}',
-            style: const TextStyle(fontSize: 16, color: Colors.white),
-          ),
-          const SizedBox(height: 20),
-          Icon(
-            weatherService.getWeatherIcon(currentWeatherData?.weather),
-            size: 64,
-            color: Colors.yellow[800],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                Icons.air,
-                color: Colors.yellow[800],
-                size: 24,
-              ),
-              const SizedBox(width: 8), // Add spacing
-              Text(
-                '${currentWeatherData?.windSpeed ?? 'N/A'} km/h',
-                style: _textStyle,
-              ),
-            ],
-          ),
-        ],
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: screenHeight *
+              0.9, // Use 90% of screen height to prevent overflow
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              locationData?.city ?? 'N/A',
+              style: _cityTextStyle.copyWith(fontSize: baseFontSize),
+              textAlign: TextAlign.center,
+            ),
+            Text(
+              '${locationData?.region}, ${locationData?.country}' ?? 'N/A',
+              style: _textStyle.copyWith(fontSize: baseFontSize),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: spacingLarge),
+            Text(
+              '${currentWeatherData?.temperature ?? 'N/A'}°C',
+              style:
+                  TextStyle(fontSize: largeFontSize, color: Colors.yellow[800]),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: spacingLarge),
+            Text(
+              '${currentWeatherData?.weather ?? 'N/A'}',
+              style: TextStyle(fontSize: baseFontSize, color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+            SizedBox(height: spacingMedium),
+            Icon(
+              weatherService.getWeatherIcon(currentWeatherData?.weather),
+              size: iconSize,
+              color: Colors.yellow[800],
+            ),
+            SizedBox(height: spacingMedium),
+            Row(
+              mainAxisSize: MainAxisSize.min, // Center the row contents
+              children: [
+                Icon(
+                  Icons.air,
+                  color: Colors.yellow[800],
+                  size: baseFontSize * 1.5,
+                ),
+                SizedBox(width: screenWidth * 0.02), // Adjust spacing
+                Text(
+                  '${currentWeatherData?.windSpeed ?? 'N/A'} km/h',
+                  style: _textStyle.copyWith(fontSize: baseFontSize),
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  TextStyle get _textStyle => const TextStyle(
-        fontSize: 16,
+  TextStyle get _textStyle => TextStyle(
         fontWeight: FontWeight.bold,
         color: Colors.white,
       );
 
   TextStyle get _cityTextStyle => TextStyle(
-        fontSize: 16,
         fontWeight: FontWeight.bold,
         color: Colors.amber[800],
       );
