@@ -1,0 +1,32 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "iPhone",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "AE356669-D0A0-4D61-97EB-FE3DFE57A415",
+      "program": "lib/ex00.dart"
+      // "program": "lib/ex01.dart"
+      // "program": "lib/ex02.dart"
+      // "program": "lib/ex03.dart"
+    },
+    {
+      "name": "iPad Air",
+      "request": "launch",
+      "type": "dart",
+      "deviceId": "21AB5657-9167-4A76-A4B7-643B174BD140",
+      "program": "lib/ex00.dart"
+      // "program": "lib/ex01.dart"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "All Devices",
+      "configurations": ["iPhone", "iPad Air"]
+    }
+  ]
+}
