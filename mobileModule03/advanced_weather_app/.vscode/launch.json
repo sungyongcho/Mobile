@@ -12,8 +12,8 @@
       // "program": "lib/ex00.dart"
       // "program": "lib/ex01.dart"
       // "program": "lib/ex02.dart"
-      "program": "lib/ex03.dart"
-      // "program": "lib/ex04.dart"
+      // "program": "lib/ex03.dart"
+      "program": "lib/ex04.dart"
     },
     {
       "name": "iPad Air",
@@ -23,8 +23,8 @@
       // "program": "lib/ex00.dart"
       // "program": "lib/ex01.dart"
       // "program": "lib/ex02.dart"
-      "program": "lib/ex03.dart"
-      // "program": "lib/ex04.dart"
+      // "program": "lib/ex03.dart"
+      "program": "lib/ex04.dart"
     }
   ],
   "compounds": [
