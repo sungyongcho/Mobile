@@ -45,17 +45,22 @@ class WeatherService {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      return CurrentWeatherData(
-        latitude: data['latitude'],
-        longitude: data['longitude'],
-        temperature: data['current']['temperature_2m'],
-        weather: _weatherMap[data['current']['weather_code']],
-        windSpeed: data['current']['wind_speed_10m'],
-      );
+      if (data['current'] != null) {
+        return CurrentWeatherData(
+          latitude: data['latitude'],
+          longitude: data['longitude'],
+          temperature: data['current']['temperature_2m'],
+          weather: _weatherMap[data['current']['weather_code']],
+          windSpeed: data['current']['wind_speed_10m'],
+        );
+      } else {
+        throw Exception(
+            'Weather data not available for the selected location.');
+      }
+    } else {
+      throw Exception(
+          'The service connection is lost. please check your internet connection or try again later.');
     }
-
-    return Future.error(
-        "The service connection is lost, please check your internet connection or try again later");
   }
 
   Future<TodayWeatherData> fetchTodayWeatherData(
@@ -66,11 +71,16 @@ class WeatherService {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
-      return TodayWeatherData.fromJson(data);
+      if (data['hourly'] != null) {
+        return TodayWeatherData.fromJson(data);
+      } else {
+        throw Exception(
+            'Weather data not available for the selected location.');
+      }
+    } else {
+      throw Exception(
+          "The service connection is lost, please check your internet connection or try again later");
     }
-
-    return Future.error(
-        "The service connection is lost, please check your internet connection or try again later");
   }
 
   Future<WeeklyWeatherData> fetchWeeklyWeatherData(
@@ -81,22 +91,26 @@ class WeatherService {
 
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
+      if (data['daily'] != null) {
+        // Map weather codes to their descriptions
+        final List<int> rawWeatherCodes =
+            List<int>.from(data['daily']['weathercode']?.cast<int>() ?? []);
+        final List<String> mappedWeatherDescriptions = rawWeatherCodes
+            .map((code) => _weatherMap[code]?.toString() ?? 'Unknown')
+            .toList();
 
-      // Map weather codes to their descriptions
-      final List<int> rawWeatherCodes =
-          List<int>.from(data['daily']['weathercode']?.cast<int>() ?? []);
-      final List<String> mappedWeatherDescriptions = rawWeatherCodes
-          .map((code) => _weatherMap[code]?.toString() ?? 'Unknown')
-          .toList();
-
-      return WeeklyWeatherData.fromJson(
-        data,
-        weatherDescriptions:
-            mappedWeatherDescriptions, // Pass mapped descriptions
-      );
+        return WeeklyWeatherData.fromJson(
+          data,
+          weatherDescriptions:
+              mappedWeatherDescriptions, // Pass mapped descriptions
+        );
+      } else {
+        throw Exception(
+            'Weather data not available for the selected location.');
+      }
+    } else {
+      throw Exception(
+          "The service connection is lost, please check your internet connection or try again later");
     }
-
-    return Future.error(
-        "The service connection is lost, please check your internet connection or try again later");
   }
 }

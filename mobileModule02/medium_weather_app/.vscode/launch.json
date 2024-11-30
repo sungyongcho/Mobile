@@ -11,7 +11,8 @@
       "deviceId": "AE356669-D0A0-4D61-97EB-FE3DFE57A415",
       // "program": "lib/ex00.dart"
       // "program": "lib/ex01.dart"
-      "program": "lib/ex02.dart"
+      // "program": "lib/ex02.dart"
+      "program": "lib/ex03.dart"
     },
     {
       "name": "iPad Air",
@@ -20,7 +21,8 @@
       "deviceId": "21AB5657-9167-4A76-A4B7-643B174BD140",
       // "program": "lib/ex00.dart"
       // "program": "lib/ex01.dart"
-      "program": "lib/ex02.dart"
+      // "program": "lib/ex02.dart"
+      "program": "lib/ex03.dart"
     }
   ],
   "compounds": [
