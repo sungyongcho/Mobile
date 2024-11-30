@@ -8,6 +8,8 @@ import 'package:advanced_weather_app/data/current_weather_data.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:geocoding/geocoding.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'dart:math';
 
 void main() {
   runApp(const Ex02App());
@@ -439,6 +441,130 @@ class _WeatherHomeState extends State<WeatherHome>
     );
   }
 
+  Widget _buildTemperatureGraph() {
+    // Prepare the data points for the chart
+    final spots = todayWeatherData!.time.asMap().entries.map((entry) {
+      final index = entry.key;
+      return FlSpot(
+        index.toDouble(),
+        todayWeatherData!.temperature[index],
+      );
+    }).toList();
+
+    // Calculate the minimum and maximum values for Y-axis
+    final minY =
+        (todayWeatherData!.temperature.reduce(min) - 5).floorToDouble();
+    final maxY = (todayWeatherData!.temperature.reduce(max) + 5).ceilToDouble();
+
+    // Set the range for X-axis
+    final minX = 0.0;
+    final maxX = (todayWeatherData!.time.length - 1).toDouble();
+
+    return Container(
+      height: 250,
+      width: double.infinity, // Make the width responsive
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+            horizontal: 16.0), // Add padding to left and right
+        child: LineChart(
+          LineChartData(
+            minX: minX,
+            maxX: maxX,
+            minY: minY,
+            maxY: maxY,
+            gridData: FlGridData(
+              show: true,
+              drawVerticalLine: true,
+              verticalInterval:
+                  3, // Adjust vertical grid lines to every 3 units
+              horizontalInterval: 5, // Adjust horizontal grid lines
+              getDrawingHorizontalLine: (value) => FlLine(
+                color: Colors.white30,
+                strokeWidth: 1,
+              ),
+              getDrawingVerticalLine: (value) => FlLine(
+                color: Colors.white30,
+                strokeWidth: 1,
+              ),
+            ),
+            titlesData: FlTitlesData(
+              leftTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  interval: 5, // Y-axis labels interval
+                  reservedSize: 40,
+                  getTitlesWidget: (value, meta) {
+                    return Text(
+                      '${value.toInt()}°C',
+                      style: const TextStyle(color: Colors.white, fontSize: 10),
+                    );
+                  },
+                ),
+              ),
+              bottomTitles: AxisTitles(
+                sideTitles: SideTitles(
+                  showTitles: true,
+                  interval: 3, // X-axis labels every 3 hours
+                  reservedSize: 30,
+                  getTitlesWidget: (value, meta) {
+                    final int index = value.toInt();
+                    if (index >= 0 &&
+                        index < todayWeatherData!.time.length &&
+                        index % 3 == 0) {
+                      final time = todayWeatherData!.time[index];
+                      return SideTitleWidget(
+                        axisSide: meta.axisSide,
+                        child: Text(
+                          time,
+                          style: const TextStyle(
+                              color: Colors.white, fontSize: 10),
+                        ),
+                      );
+                    } else {
+                      return Container();
+                    }
+                  },
+                ),
+              ),
+              topTitles: AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+              rightTitles: AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
+            ),
+            borderData: FlBorderData(
+              show: true,
+              border: Border.all(color: Colors.white30, width: 1),
+            ),
+            lineBarsData: [
+              LineChartBarData(
+                spots: spots,
+                isCurved: true,
+                color: Colors.orange,
+                barWidth: 3,
+                isStrokeCapRound: true,
+                belowBarData: BarAreaData(
+                  show: false,
+                ),
+                dotData: FlDotData(
+                  show: true,
+                  getDotPainter: (spot, percent, bar, index) =>
+                      FlDotCirclePainter(
+                    radius: 4,
+                    color: Colors.white, // Center color of the dot
+                    strokeWidth: 2,
+                    strokeColor: Colors.orange, // Border color of the dot
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildTodayWeather() {
     if (currentWeatherData == null) {
       return const Center(child: CircularProgressIndicator());
@@ -454,7 +580,22 @@ class _WeatherHomeState extends State<WeatherHome>
           SizedBox(
             height: 50,
           ),
+          _buildTemperatureGraph(),
+          SizedBox(
+            height: 50,
+          ),
           _buildHourlyWeatherList()
+          // ...todayWeatherData!.time.asMap().entries.map((entry) {
+          //   final index = entry.key;
+          //   final time = entry.value;
+          //   final temperature = todayWeatherData!.temperature[index];
+          //   final windSpeed = todayWeatherData!.windSpeed[index];
+
+          //   return Text(
+          //     '$time  $temperature°C  $windSpeed km/h',
+          //     style: _todayWeatherListStyle,
+          //   );
+          // }).toList(),
         ],
       ),
     );
