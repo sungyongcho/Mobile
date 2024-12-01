@@ -1,0 +1,1 @@
+{"flutter":{"platforms":{"ios":{"default":{"projectId":"my-diary-app-a824f","appId":"1:512649955649:ios:9c90a70893b211ca2239c0","uploadDebugSymbols":false,"fileOutput":"ios/Runner/GoogleService-Info.plist"}},"dart":{"lib/firebase_options.dart":{"projectId":"my-diary-app-a824f","configurations":{"ios":"1:512649955649:ios:9c90a70893b211ca2239c0"}}}}}}

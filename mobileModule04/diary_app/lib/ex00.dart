@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'diary_page.dart';
-import 'initial_landing_page.dart';
+import 'package:diary_app/pages/diary_page.dart';
+import 'package:diary_app/pages/initial_landing_page_00.dart';
 
 void main() {
   runApp(MyApp());
