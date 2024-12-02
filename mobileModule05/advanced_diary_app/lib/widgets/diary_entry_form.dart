@@ -1,6 +1,7 @@
 import 'package:advanced_diary_app/services/firestore_service.dart';
 import 'package:flutter/material.dart';
 import 'package:advanced_diary_app/utils/emotion_icons.dart';
+import 'package:intl/intl.dart';
 
 class DiaryEntryForm extends StatefulWidget {
   final String email;
@@ -17,6 +18,7 @@ class __DiaryEntryFormState extends State<DiaryEntryForm> {
   String _title = '';
   String _text = '';
   String _icon = 'satisfied';
+  DateTime _selectedDate = DateTime.now();
 
   Future<void> _saveEntry() async {
     if (_formKey.currentState!.validate()) {
@@ -27,10 +29,25 @@ class __DiaryEntryFormState extends State<DiaryEntryForm> {
         title: _title,
         text: _text,
         icon: _icon,
-        date: DateTime.now(),
+        date: _selectedDate,
       );
 
       widget.onSave();
+    }
+  }
+
+  void _pickDate() async {
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate,
+      firstDate: DateTime(2000),
+      lastDate: DateTime.now(),
+    );
+
+    if (pickedDate != null) {
+      setState(() {
+        _selectedDate = pickedDate;
+      });
     }
   }
 
@@ -63,7 +80,6 @@ class __DiaryEntryFormState extends State<DiaryEntryForm> {
                     value!.isEmpty ? 'Content is required' : null,
               ),
               SizedBox(height: 20),
-              // Dropdown for selecting emotion
               DropdownButtonFormField<String>(
                 value: _icon,
                 items: emotionIcons.keys.map((emotion) {
@@ -84,6 +100,20 @@ class __DiaryEntryFormState extends State<DiaryEntryForm> {
                   });
                 },
                 decoration: InputDecoration(labelText: 'Feeling'),
+              ),
+              SizedBox(height: 20),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Date: ${DateFormat('yyyy-MM-dd').format(_selectedDate)}',
+                    style: TextStyle(fontSize: 16),
+                  ),
+                  TextButton(
+                    onPressed: _pickDate,
+                    child: Text('Pick Date'),
+                  ),
+                ],
               ),
               SizedBox(height: 20),
               ElevatedButton(
