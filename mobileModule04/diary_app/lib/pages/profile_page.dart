@@ -12,25 +12,25 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  String? email; // Email passed via Navigator arguments
+  String? username; // username passed via Navigator arguments
   List<Map<String, dynamic>> _diaryEntries = []; // Diary entries list
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Retrieve email from Navigator arguments
+    // Retrieve username from Navigator arguments
     final args = ModalRoute.of(context)!.settings.arguments as Map?;
-    email = args?['email'];
+    username = args?['username'];
 
-    if (email != null) {
+    if (username != null) {
       _fetchDiaryEntries();
     }
   }
 
   Future<void> _fetchDiaryEntries() async {
-    if (email == null) return;
+    if (username == null) return;
 
-    final entries = await FirestoreService.getDiaryEntries(email!);
+    final entries = await FirestoreService.getDiaryEntries(username!);
     setState(() {
       _diaryEntries = entries;
     });
@@ -48,7 +48,7 @@ class _ProfilePageState extends State<ProfilePage> {
       isScrollControlled: true,
       builder: (context) {
         return DiaryEntryForm(
-          email: email!,
+          username: username!,
           onSave: () {
             Navigator.pop(context); // Close the sheet
             _fetchDiaryEntries(); // Refresh the list

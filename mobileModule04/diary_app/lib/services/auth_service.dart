@@ -1,19 +1,13 @@
-import 'package:flutter_appauth/flutter_appauth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:auth0_flutter/auth0_flutter.dart';
 
 class AuthService {
-  static final FlutterAppAuth _appAuth = FlutterAppAuth();
   static final _secureStorage = FlutterSecureStorage();
 
   static const String _auth0Domain = 'dev-fb7oqdb8wywh7mm6.eu.auth0.com';
   static const String _auth0ClientId = 'DiZbX3AyOUmYDLkr4SKKBLiP0YlLG5ns';
-  static const String _auth0RedirectUri = 'com.auth0.flutter:/callback';
-  static const String _auth0Issuer = 'https://$_auth0Domain';
-  static var auth0 = Auth0(
-      'dev-fb7oqdb8wywh7mm6.eu.auth0.com', 'DiZbX3AyOUmYDLkr4SKKBLiP0YlLG5ns');
+  static var auth0 = Auth0(_auth0Domain, _auth0ClientId);
 
   static Future<String?> login() async {
     try {
@@ -29,7 +23,12 @@ class AuthService {
       // Extract email from ID token
       final idToken = result.idToken!;
       final payload = _parseJwt(idToken);
-      return payload['email'];
+
+      final email = payload['email'] as String?; // Google field
+      final nickname = payload['nickname'] as String?; // GitHub field
+      final username = email ?? nickname;
+
+      return username;
     } catch (e) {
       print('Login failed: $e');
     }

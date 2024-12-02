@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:diary_app/utils/emotion_icons.dart';
 
 class DiaryEntryForm extends StatefulWidget {
-  final String email;
+  final String username;
   final VoidCallback onSave;
 
-  DiaryEntryForm({required this.email, required this.onSave});
+  DiaryEntryForm({required this.username, required this.onSave});
 
   @override
   __DiaryEntryFormState createState() => __DiaryEntryFormState();
@@ -23,7 +23,7 @@ class __DiaryEntryFormState extends State<DiaryEntryForm> {
       _formKey.currentState!.save();
 
       await FirestoreService.saveDiaryEntry(
-        email: widget.email,
+        username: widget.username,
         title: _title,
         text: _text,
         icon: _icon,

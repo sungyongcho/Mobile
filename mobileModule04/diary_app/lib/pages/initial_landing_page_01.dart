@@ -19,12 +19,12 @@ class InitialLandingPage extends StatelessWidget {
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () async {
-                final userEmail = await AuthService.login();
-                if (userEmail != null) {
+                final username = await AuthService.login();
+                if (username != null) {
                   // Navigate to the Profile Page
                   Navigator.pushReplacementNamed(context, '/profile',
                       arguments: {
-                        'email': userEmail,
+                        'username': username,
                       });
                 }
               },
