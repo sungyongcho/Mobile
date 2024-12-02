@@ -1,12 +1,28 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:advanced_diary_app/utils/emotion_icons.dart'; // Import emotionIcons
+import 'package:advanced_diary_app/utils/emotion_icons.dart';
+import 'package:advanced_diary_app/services/firestore_service.dart'; // Ensure FirestoreService is imported
 
 class DiaryEntryDetails extends StatelessWidget {
   final Map<String, dynamic> entry;
 
   DiaryEntryDetails({required this.entry});
-  // Define a map of feelings to Material icons
+
+  Future<void> _deleteEntry(BuildContext context, String documentId) async {
+    try {
+      await FirestoreService.deleteDiaryEntry(
+          documentId); // Call Firestore delete
+      Navigator.pop(context); // Close the modal after deletion
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Entry deleted successfully!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete entry: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     IconData emotionIcon = emotionIcons[entry['icon']] ?? Icons.help_outline;
@@ -46,12 +62,30 @@ class DiaryEntryDetails extends StatelessWidget {
             style: TextStyle(fontSize: 18),
           ),
           SizedBox(height: 20),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('Close'),
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  final documentId = entry['id'];
+                  if (documentId != null) {
+                    _deleteEntry(context, documentId);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Invalid entry ID!')),
+                    );
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.red, // Delete button color
+                ),
+                child: Text('Delete'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('Close'),
+              ),
+            ],
           ),
         ],
       ),

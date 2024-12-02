@@ -5,6 +5,7 @@ import 'package:advanced_diary_app/widgets/diary_entry_form.dart';
 import 'package:flutter/material.dart';
 import 'package:advanced_diary_app/services/firestore_service.dart';
 import 'package:intl/intl.dart';
+import 'package:advanced_diary_app/utils/emotion_icons.dart';
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -15,7 +16,9 @@ class _ProfilePageState extends State<ProfilePage> {
   String? username;
   String? firstName;
   String? lastName;
-  List<Map<String, dynamic>> _diaryEntries = []; // Diary entries list
+  List<Map<String, dynamic>> _diaryEntries = [];
+  int totalEntries = 0;
+  Map<String, double> feelingsPercentage = {};
 
   @override
   void didChangeDependencies() {
@@ -36,46 +39,36 @@ class _ProfilePageState extends State<ProfilePage> {
 
     final entries = await FirestoreService.getDiaryEntries(username!);
     setState(() {
-      _diaryEntries = entries;
+      _diaryEntries =
+          entries.reversed.toList(); // Reverse to show latest entries
+      totalEntries = entries.length;
+      _calculateFeelingsPercentage();
     });
   }
 
-  Future<void> _deleteEntry(String documentId) async {
-    await FirestoreService.deleteDiaryEntry(documentId);
-    _fetchDiaryEntries(); // Refresh the list after deletion
-  }
+  void _calculateFeelingsPercentage() {
+    if (_diaryEntries.isEmpty) {
+      feelingsPercentage = {};
+      return;
+    }
 
-  void _showCreateEntrySheet() {
-    // Show modal bottom sheet for creating a new diary entry
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) {
-        return DiaryEntryForm(
-          username: username!,
-          onSave: () {
-            Navigator.pop(context); // Close the sheet
-            _fetchDiaryEntries(); // Refresh the list
-          },
-        );
-      },
-    );
-  }
+    // Count occurrences of each feeling
+    final feelingsCount = <String, int>{};
+    for (var entry in _diaryEntries) {
+      final feeling =
+          entry['icon'] ?? 'unknown'; // Default to 'unknown' if no icon
+      feelingsCount[feeling] = (feelingsCount[feeling] ?? 0) + 1;
+    }
 
-  void _showReadEntrySheet(Map<String, dynamic> entry) {
-    // Show modal bottom sheet for reading an entry
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      builder: (context) {
-        return DiaryEntryDetails(entry: entry);
-      },
-    );
-  }
+    // Calculate percentages
+    final Map<String, double> percentageMap = {};
+    feelingsCount.forEach((key, value) {
+      percentageMap[key] = (value / totalEntries) * 100;
+    });
 
-  Future<void> _logout() async {
-    await AuthService.logout(); // Call logout function from AuthService
-    Navigator.pushReplacementNamed(context, '/'); // Redirect to login page
+    setState(() {
+      feelingsPercentage = percentageMap;
+    });
   }
 
   @override
@@ -83,6 +76,7 @@ class _ProfilePageState extends State<ProfilePage> {
     return Scaffold(
       appBar: AppBar(
         title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('My Diary Entries'),
             if (firstName != null && lastName != null)
@@ -93,7 +87,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ],
         ),
         leading: IconButton(
-          icon: Icon(Icons.arrow_back), // Custom back arrow
+          icon: Icon(Icons.logout), // Logout icon
           onPressed: () {
             // Show a confirmation dialog before logging out
             showDialog(
@@ -119,33 +113,112 @@ class _ProfilePageState extends State<ProfilePage> {
           },
         ),
       ),
-      body: _diaryEntries.isEmpty
-          ? Center(child: Text('No entries found.'))
-          : ListView.builder(
-              itemCount: _diaryEntries.length,
-              itemBuilder: (context, index) {
-                final entry = _diaryEntries[index];
-                return ListTile(
-                  title: Text(entry['title'] ?? 'No Title'),
-                  subtitle: Text(
-                    entry['date'] != null
-                        ? DateFormat('yyyy-MM-dd – kk:mm').format(
-                            (entry['date'] as Timestamp)
-                                .toDate()) // Convert Timestamp to DateTime
-                        : 'No Date',
-                  ),
-                  onTap: () => _showReadEntrySheet(entry),
-                  trailing: IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () => _deleteEntry(entry['id']),
-                  ),
-                );
-              },
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Display total number of entries
+            Text(
+              'Total Entries: $totalEntries',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
+            SizedBox(height: 20),
+            // Display the last 2 entries
+            Text(
+              'Last 2 Entries',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            _diaryEntries.isEmpty
+                ? Center(child: Text('No entries found.'))
+                : ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: _diaryEntries.length < 2
+                        ? _diaryEntries.length
+                        : 2, // Show only the last 2 entries
+                    itemBuilder: (context, index) {
+                      final entry = _diaryEntries[index];
+                      return ListTile(
+                        leading: Icon(
+                          emotionIcons[entry['icon']] ?? Icons.help,
+                          color: Colors.blue,
+                        ),
+                        title: Text(entry['title'] ?? 'No Title'),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (entry['date'] != null)
+                              Text(
+                                DateFormat('yyyy-MM-dd – kk:mm').format(
+                                    (entry['date'] as Timestamp).toDate()),
+                              ),
+                            Text('Feeling: ${entry['icon'] ?? 'None'}'),
+                          ],
+                        ),
+                        onTap: () => _showReadEntrySheet(entry),
+                      );
+                    },
+                  ),
+            // Display feelings percentages
+            Text(
+              'Feelings Distribution',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            feelingsPercentage.isEmpty
+                ? Center(child: Text('No feelings recorded.'))
+                : ListView(
+                    shrinkWrap: true,
+                    children: feelingsPercentage.entries.map((entry) {
+                      return ListTile(
+                        leading: Icon(
+                          emotionIcons[entry.key] ?? Icons.help,
+                          color: Colors.blue,
+                        ),
+                        title: Text(entry.key),
+                        subtitle: Text('${entry.value.toStringAsFixed(1)}%'),
+                      );
+                    }).toList(),
+                  ),
+          ],
+        ),
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showCreateEntrySheet,
         child: Icon(Icons.add),
       ),
     );
+  }
+
+  void _showCreateEntrySheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return DiaryEntryForm(
+          username: username!,
+          onSave: () {
+            Navigator.pop(context); // Close the sheet
+            _fetchDiaryEntries(); // Refresh the list
+          },
+        );
+      },
+    );
+  }
+
+  void _showReadEntrySheet(Map<String, dynamic> entry) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        return DiaryEntryDetails(entry: entry); // No need for onDelete
+      },
+    );
+  }
+
+  Future<void> _logout() async {
+    await AuthService.logout(); // Call logout function from AuthService
+    Navigator.pushReplacementNamed(context, '/'); // Redirect to login page
   }
 }
