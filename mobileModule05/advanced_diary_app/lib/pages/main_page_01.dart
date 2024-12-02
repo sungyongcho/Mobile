@@ -1,6 +1,6 @@
 import 'package:advanced_diary_app/services/auth_service.dart';
 import 'package:advanced_diary_app/widgets/calendar_view_page.dart';
-import 'package:advanced_diary_app/widgets/diary_entry_details.dart';
+import 'package:advanced_diary_app/widgets/diary_entry_details_01.dart';
 import 'package:advanced_diary_app/widgets/diary_entry_form.dart';
 import 'package:flutter/material.dart';
 import 'package:advanced_diary_app/services/firestore_service.dart';

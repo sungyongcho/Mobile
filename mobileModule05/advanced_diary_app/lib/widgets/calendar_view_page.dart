@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'diary_entry_details.dart';
+import 'diary_entry_details_01.dart';
 import 'package:advanced_diary_app/utils/feelings.dart';
 
 class CalendarView extends StatefulWidget {

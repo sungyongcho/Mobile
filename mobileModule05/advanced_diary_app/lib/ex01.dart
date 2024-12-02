@@ -1,4 +1,4 @@
-import 'package:advanced_diary_app/pages/main_page.dart';
+import 'package:advanced_diary_app/pages/main_page_01.dart';
 import 'package:flutter/material.dart';
 import 'pages/initial_landing_page.dart';
 import 'package:firebase_core/firebase_core.dart';

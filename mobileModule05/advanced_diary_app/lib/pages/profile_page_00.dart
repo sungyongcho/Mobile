@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:advanced_diary_app/services/auth_service.dart';
-import 'package:advanced_diary_app/widgets/diary_entry_details.dart';
+import 'package:advanced_diary_app/widgets/diary_entry_details_00.dart';
 import 'package:advanced_diary_app/widgets/diary_entry_form.dart';
 import 'package:flutter/material.dart';
 import 'package:advanced_diary_app/services/firestore_service.dart';
@@ -39,8 +39,12 @@ class _ProfilePageState extends State<ProfilePage> {
 
     final entries = await FirestoreService.getDiaryEntries(username!);
     setState(() {
-      _diaryEntries =
-          entries.reversed.toList(); // Reverse to show latest entries
+      _diaryEntries = entries
+          .where((entry) => entry['date'] != null) // Filter valid entries
+          .toList()
+        ..sort((a, b) => (b['date'] as Timestamp)
+            .toDate()
+            .compareTo((a['date'] as Timestamp).toDate()));
       totalEntries = entries.length;
       _calculateFeelingsPercentage();
     });
@@ -214,11 +218,6 @@ class _ProfilePageState extends State<ProfilePage> {
       builder: (context) {
         return DiaryEntryDetails(
           entry: entry,
-          onDelete: () async {
-            await FirestoreService.deleteDiaryEntry(entry['id']);
-            Navigator.pop(context); // Close modal
-            await _fetchDiaryEntries(); // Refresh entries in MainPage
-          },
         );
       },
     );

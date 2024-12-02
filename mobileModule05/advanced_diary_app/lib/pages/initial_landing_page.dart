@@ -24,7 +24,7 @@ class InitialLandingPage extends StatelessWidget {
                   // Navigate to the Profile Page
                   Navigator.pushReplacementNamed(
                     context,
-                    '/main',
+                    '/profile',
                     arguments: {
                       'username': userDetails['username'],
                       'first_name': userDetails['first_name'],
