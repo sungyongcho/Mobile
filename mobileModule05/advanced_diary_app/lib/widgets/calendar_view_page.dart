@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'diary_entry_details.dart';
+import 'package:advanced_diary_app/utils/feelings.dart';
 
 class CalendarView extends StatefulWidget {
   final List<Map<String, dynamic>> diaryEntries;
@@ -139,9 +141,28 @@ class _CalendarViewState extends State<CalendarView> {
                             ),
                           ),
                           child: ListTile(
+                            leading: Icon(
+                              emotionIcons[entry['icon']] ??
+                                  Icons.help, // Map feeling to an icon
+                              color: Colors.blue,
+                            ),
                             title: Text(entry['title'] ?? 'Untitled Entry'),
-                            subtitle:
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
                                 Text(entry['text'] ?? 'No details available.'),
+                                if (entry['date'] != null)
+                                  Text(
+                                    DateFormat(
+                                            'yyyy-MM-dd – kk:mm') // Customize the format as needed
+                                        .format((entry['date'] as Timestamp)
+                                            .toDate()),
+                                    style: TextStyle(
+                                        fontSize: 12,
+                                        color: Colors.grey), // Style the date
+                                  ),
+                              ],
+                            ),
                             onTap: () => _showEntryDetails(entry),
                           ),
                         );
