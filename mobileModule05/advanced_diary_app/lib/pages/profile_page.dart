@@ -212,7 +212,14 @@ class _ProfilePageState extends State<ProfilePage> {
       context: context,
       isScrollControlled: true,
       builder: (context) {
-        return DiaryEntryDetails(entry: entry); // No need for onDelete
+        return DiaryEntryDetails(
+          entry: entry,
+          onDelete: () async {
+            await FirestoreService.deleteDiaryEntry(entry['id']);
+            Navigator.pop(context); // Close modal
+            await _fetchDiaryEntries(); // Refresh entries in MainPage
+          },
+        );
       },
     );
   }

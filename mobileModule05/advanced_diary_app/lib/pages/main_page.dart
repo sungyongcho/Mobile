@@ -5,7 +5,6 @@ import 'package:advanced_diary_app/widgets/diary_entry_form.dart';
 import 'package:flutter/material.dart';
 import 'package:advanced_diary_app/services/firestore_service.dart';
 import 'package:advanced_diary_app/widgets/profile_view_page.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -22,22 +21,26 @@ class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0; // Index to track the selected tab
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final args = ModalRoute.of(context)!.settings.arguments as Map?;
-    username = args?['username'];
-    firstName = args?['first_name'];
-    lastName = args?['last_name'];
+  void initState() {
+    super.initState();
+    // Simulate arguments passed through Navigator if needed
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final args = ModalRoute.of(context)!.settings.arguments as Map?;
+      username = args?['username'];
+      firstName = args?['first_name'];
+      lastName = args?['last_name'];
 
-    if (username != null) {
-      _fetchDiaryEntries();
-    }
+      if (username != null) {
+        _fetchDiaryEntries();
+      }
+    });
   }
 
   Future<void> _fetchDiaryEntries() async {
     if (username == null) return;
 
     final entries = await FirestoreService.getDiaryEntries(username!);
+
     setState(() {
       _diaryEntries = entries.reversed.toList();
       totalEntries = entries.length;
@@ -99,14 +102,16 @@ class _MainPageState extends State<MainPage> {
             feelingsPercentage: feelingsPercentage,
             onReadEntry: _showReadEntrySheet,
           ),
-          CalendarView(
-            markedDates: {
-              for (var entry in _diaryEntries)
-                (entry['date'] as Timestamp).toDate(): [
-                  entry['title'] ?? 'Untitled'
-                ]
-            },
-          ),
+          _diaryEntries.isEmpty
+              ? Center(
+                  child:
+                      CircularProgressIndicator()) // Show loading until entries are fetched
+              : CalendarView(
+                  diaryEntries: _diaryEntries,
+                  onEntryDeleted: () async {
+                    await _fetchDiaryEntries(); // Refresh entries in MainPage
+                  }, // Pass the entire list of entries
+                ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -163,7 +168,14 @@ class _MainPageState extends State<MainPage> {
       context: context,
       isScrollControlled: true,
       builder: (context) {
-        return DiaryEntryDetails(entry: entry); // No need for onDelete
+        return DiaryEntryDetails(
+          entry: entry,
+          onDelete: () async {
+            await FirestoreService.deleteDiaryEntry(entry['id']);
+            Navigator.pop(context); // Close modal
+            await _fetchDiaryEntries(); // Refresh entries in MainPage
+          },
+        );
       },
     );
   }

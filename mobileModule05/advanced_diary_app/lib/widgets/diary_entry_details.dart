@@ -1,17 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:advanced_diary_app/utils/feelings.dart';
-import 'package:advanced_diary_app/services/firestore_service.dart'; // Ensure FirestoreService is imported
+import 'package:advanced_diary_app/services/firestore_service.dart';
 
 class DiaryEntryDetails extends StatelessWidget {
   final Map<String, dynamic> entry;
+  final VoidCallback onDelete; // Add callback for deletion
 
-  DiaryEntryDetails({required this.entry});
+  DiaryEntryDetails({required this.entry, required this.onDelete});
 
   Future<void> _deleteEntry(BuildContext context, String documentId) async {
     try {
       await FirestoreService.deleteDiaryEntry(
           documentId); // Call Firestore delete
+      onDelete(); // Notify parent widget about deletion
       Navigator.pop(context); // Close the modal after deletion
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Entry deleted successfully!')),
