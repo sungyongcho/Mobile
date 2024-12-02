@@ -60,5 +60,4 @@ class DefaultFirebaseOptions {
     storageBucket: 'advanced-diary-app.firebasestorage.app',
     iosBundleId: 'com.example.advancedDiaryApp',
   );
-
 }

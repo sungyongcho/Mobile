@@ -1,6 +1,6 @@
 import 'package:advanced_diary_app/pages/profile_page.dart';
 import 'package:flutter/material.dart';
-import 'pages/initial_landing_page_01.dart';
+import 'pages/initial_landing_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 

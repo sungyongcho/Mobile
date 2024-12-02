@@ -6,7 +6,7 @@ class AuthService {
   static const _secureStorage = FlutterSecureStorage();
 
   static const String _auth0Domain = 'dev-fb7oqdb8wywh7mm6.eu.auth0.com';
-  static const String _auth0ClientId = 'DiZbX3AyOUmYDLkr4SKKBLiP0YlLG5ns';
+  static const String _auth0ClientId = 'W5KMVcEuEUpdy9hK9isaE3tSszjuNbiD';
   static var auth0 = Auth0(_auth0Domain, _auth0ClientId);
 
   static Future<String?> login() async {
