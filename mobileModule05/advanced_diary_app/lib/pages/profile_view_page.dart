@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:advanced_diary_app/utils/emotion_icons.dart';
+import 'package:advanced_diary_app/utils/feelings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class ProfileView extends StatelessWidget {
@@ -18,71 +18,93 @@ class ProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Total Entries: $totalEntries',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 20),
-          Text(
-            'Last 2 Entries',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 10),
-          diaryEntries.isEmpty
-              ? Center(child: Text('No entries found.'))
-              : ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: diaryEntries.length < 2 ? diaryEntries.length : 2,
-                  itemBuilder: (context, index) {
-                    final entry = diaryEntries[index];
-                    return ListTile(
-                      leading: Icon(
-                        emotionIcons[entry['icon']] ?? Icons.help,
-                        color: Colors.blue,
-                      ),
-                      title: Text(entry['title'] ?? 'No Title'),
-                      subtitle: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (entry['date'] != null)
-                            Text(
-                              DateFormat('yyyy-MM-dd – kk:mm').format(
-                                  (entry['date'] as Timestamp).toDate()),
-                            ),
-                          Text('Feeling: ${entry['icon'] ?? 'None'}'),
-                        ],
-                      ),
-                      onTap: () => onReadEntry(entry),
-                    );
-                  },
-                ),
-          Text(
-            'Feelings Distribution',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 10),
-          feelingsPercentage.isEmpty
-              ? Center(child: Text('No feelings recorded.'))
-              : ListView(
-                  shrinkWrap: true,
-                  children: feelingsPercentage.entries.map((entry) {
-                    return ListTile(
-                      leading: Icon(
-                        emotionIcons[entry.key] ?? Icons.help,
-                        color: Colors.blue,
-                      ),
-                      title: Text(entry.key),
-                      subtitle: Text('${entry.value.toStringAsFixed(1)}%'),
-                    );
-                  }).toList(),
-                ),
-        ],
+    // Ensure all feelings are present, defaulting to 0% if missing
+    final Map<String, double> completeFeelingsPercentage = {
+      for (var feeling in feelingsOrder)
+        feeling: feelingsPercentage[feeling] ?? 0.0,
+    };
+
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Last 2 Entries',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 5),
+            diaryEntries.isEmpty
+                ? Center(child: Text('No entries found.'))
+                : ConstrainedBox(
+                    constraints: BoxConstraints(maxHeight: 200),
+                    child: ListView.builder(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      itemCount:
+                          diaryEntries.length < 2 ? diaryEntries.length : 2,
+                      itemBuilder: (context, index) {
+                        final entry = diaryEntries[index];
+                        return ListTile(
+                          leading: Icon(
+                            emotionIcons[entry['icon']] ?? Icons.help,
+                            color: Colors.blue,
+                          ),
+                          title: Text(entry['title'] ?? 'No Title'),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (entry['date'] != null)
+                                Text(
+                                  DateFormat('yyyy-MM-dd – kk:mm').format(
+                                      (entry['date'] as Timestamp).toDate()),
+                                ),
+                              Text('Feeling: ${entry['icon'] ?? 'None'}'),
+                            ],
+                          ),
+                          onTap: () => onReadEntry(entry),
+                        );
+                      },
+                    ),
+                  ),
+            Text(
+              'Feelings Distribution',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 5),
+            Text(
+              'Total Entries: $totalEntries',
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: NeverScrollableScrollPhysics(),
+              itemCount: feelingsOrder.length,
+              itemBuilder: (context, index) {
+                final feeling = feelingsOrder[index];
+                return ListTile(
+                  leading: Icon(
+                    emotionIcons[feeling] ?? Icons.help,
+                    color: Colors.blue,
+                  ),
+                  title: Text(feeling.replaceAll('_', ' ').capitalize()),
+                  subtitle: Text(
+                    '${completeFeelingsPercentage[feeling]!.toStringAsFixed(1)}%',
+                  ),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
+  }
+}
+
+extension StringExtensions on String {
+  String capitalize() {
+    if (isEmpty) return this;
+    return '${this[0].toUpperCase()}${substring(1)}';
   }
 }

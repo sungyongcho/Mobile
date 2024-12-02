@@ -1,6 +1,6 @@
 import 'package:advanced_diary_app/services/firestore_service.dart';
 import 'package:flutter/material.dart';
-import 'package:advanced_diary_app/utils/emotion_icons.dart';
+import 'package:advanced_diary_app/utils/feelings.dart';
 import 'package:intl/intl.dart';
 
 class DiaryEntryForm extends StatefulWidget {

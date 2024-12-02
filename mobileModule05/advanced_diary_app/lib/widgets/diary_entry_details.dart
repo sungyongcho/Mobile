@@ -1,6 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:advanced_diary_app/utils/emotion_icons.dart';
+import 'package:advanced_diary_app/utils/feelings.dart';
 import 'package:advanced_diary_app/services/firestore_service.dart'; // Ensure FirestoreService is imported
 
 class DiaryEntryDetails extends StatelessWidget {

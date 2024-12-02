@@ -8,3 +8,12 @@ final Map<String, IconData> emotionIcons = {
   'dissatisfied': Icons.sentiment_dissatisfied,
   'very_dissatisfied': Icons.sentiment_very_dissatisfied,
 };
+
+// Define the feelings and their display order
+final List<String> feelingsOrder = [
+  'very_satisfied',
+  'satisfied',
+  'neutral',
+  'dissatisfied',
+  'very_dissatisfied',
+];
