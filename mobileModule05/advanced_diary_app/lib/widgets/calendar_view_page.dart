@@ -87,9 +87,6 @@ class _CalendarViewState extends State<CalendarView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Calendar View'),
-      ),
       body: Column(
         children: [
           TableCalendar(
@@ -126,17 +123,30 @@ class _CalendarViewState extends State<CalendarView> {
           Expanded(
             child: _selectedEntries.isEmpty
                 ? Center(child: Text('No entries for this date.'))
-                : ListView.builder(
-                    itemCount: _selectedEntries.length,
-                    itemBuilder: (context, index) {
-                      final entry = _selectedEntries[index];
-                      return ListTile(
-                        title: Text(entry['title'] ?? 'Untitled Entry'),
-                        subtitle:
-                            Text(entry['text'] ?? 'No details available.'),
-                        onTap: () => _showEntryDetails(entry),
-                      );
-                    },
+                : Scrollbar(
+                    thumbVisibility: true,
+                    child: ListView.builder(
+                      primary: false,
+                      itemCount: _selectedEntries.length,
+                      itemBuilder: (context, index) {
+                        final entry = _selectedEntries[index];
+                        return Container(
+                          decoration: BoxDecoration(
+                            border: Border(
+                              bottom: BorderSide(
+                                  color: Colors.grey,
+                                  width: 1.0), // Add bottom border
+                            ),
+                          ),
+                          child: ListTile(
+                            title: Text(entry['title'] ?? 'Untitled Entry'),
+                            subtitle:
+                                Text(entry['text'] ?? 'No details available.'),
+                            onTap: () => _showEntryDetails(entry),
+                          ),
+                        );
+                      },
+                    ),
                   ),
           ),
         ],
