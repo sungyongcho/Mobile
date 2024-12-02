@@ -22,9 +22,10 @@ class InitialLandingPage extends StatelessWidget {
                 final userEmail = await AuthService.login();
                 if (userEmail != null) {
                   // Navigate to the Profile Page
-                  Navigator.pushNamed(context, '/profile', arguments: {
-                    'email': userEmail,
-                  });
+                  Navigator.pushReplacementNamed(context, '/profile',
+                      arguments: {
+                        'email': userEmail,
+                      });
                 }
               },
               child: const Text('Login'),
