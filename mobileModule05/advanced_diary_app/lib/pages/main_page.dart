@@ -1,9 +1,11 @@
 import 'package:advanced_diary_app/services/auth_service.dart';
+import 'package:advanced_diary_app/widgets/calendar_view_page.dart';
 import 'package:advanced_diary_app/widgets/diary_entry_details.dart';
 import 'package:advanced_diary_app/widgets/diary_entry_form.dart';
 import 'package:flutter/material.dart';
 import 'package:advanced_diary_app/services/firestore_service.dart';
-import 'package:advanced_diary_app/pages/profile_view_page.dart';
+import 'package:advanced_diary_app/widgets/profile_view_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -97,7 +99,14 @@ class _MainPageState extends State<MainPage> {
             feelingsPercentage: feelingsPercentage,
             onReadEntry: _showReadEntrySheet,
           ),
-          _buildCalendarView(),
+          CalendarView(
+            markedDates: {
+              for (var entry in _diaryEntries)
+                (entry['date'] as Timestamp).toDate(): [
+                  entry['title'] ?? 'Untitled'
+                ]
+            },
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(
