@@ -5,6 +5,7 @@ import 'package:advanced_diary_app/widgets/diary_entry_form.dart';
 import 'package:flutter/material.dart';
 import 'package:advanced_diary_app/services/firestore_service.dart';
 import 'package:advanced_diary_app/widgets/profile_view_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -42,7 +43,12 @@ class _MainPageState extends State<MainPage> {
     final entries = await FirestoreService.getDiaryEntries(username!);
 
     setState(() {
-      _diaryEntries = entries.reversed.toList();
+      _diaryEntries = entries
+          .where((entry) => entry['date'] != null) // Filter valid entries
+          .toList()
+        ..sort((a, b) => (b['date'] as Timestamp)
+            .toDate()
+            .compareTo((a['date'] as Timestamp).toDate()));
       totalEntries = entries.length;
       _calculateFeelingsPercentage();
     });

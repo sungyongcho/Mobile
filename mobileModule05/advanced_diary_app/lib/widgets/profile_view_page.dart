@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:advanced_diary_app/utils/feelings.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:advanced_diary_app/utils/strings_extensions.dart';
 
-class ProfileView extends StatelessWidget {
+class ProfileView extends StatefulWidget {
   final List<Map<String, dynamic>> diaryEntries;
   final int totalEntries;
   final Map<String, double> feelingsPercentage;
@@ -17,11 +18,16 @@ class ProfileView extends StatelessWidget {
   });
 
   @override
+  _ProfileViewState createState() => _ProfileViewState();
+}
+
+class _ProfileViewState extends State<ProfileView> {
+  @override
   Widget build(BuildContext context) {
-    // Ensure all feelings are present, defaulting to 0% if missing
-    final Map<String, double> completeFeelingsPercentage = {
+    final diaryEntries = widget.diaryEntries;
+    final completeFeelingsPercentage = {
       for (var feeling in feelingsOrder)
-        feeling: feelingsPercentage[feeling] ?? 0.0,
+        feeling: widget.feelingsPercentage[feeling] ?? 0.0,
     };
 
     return SingleChildScrollView(
@@ -57,13 +63,13 @@ class ProfileView extends StatelessWidget {
                             children: [
                               if (entry['date'] != null)
                                 Text(
-                                  DateFormat('yyyy-MM-dd – kk:mm').format(
+                                  DateFormat('yyyy-MM-dd').format(
                                       (entry['date'] as Timestamp).toDate()),
                                 ),
                               Text('Feeling: ${entry['icon'] ?? 'None'}'),
                             ],
                           ),
-                          onTap: () => onReadEntry(entry),
+                          onTap: () => widget.onReadEntry(entry),
                         );
                       },
                     ),
@@ -74,7 +80,7 @@ class ProfileView extends StatelessWidget {
             ),
             SizedBox(height: 5),
             Text(
-              'Total Entries: $totalEntries',
+              'Total Entries: ${widget.totalEntries}',
               style: TextStyle(fontSize: 14, color: Colors.grey),
             ),
             ListView.builder(
@@ -99,12 +105,5 @@ class ProfileView extends StatelessWidget {
         ),
       ),
     );
-  }
-}
-
-extension StringExtensions on String {
-  String capitalize() {
-    if (isEmpty) return this;
-    return '${this[0].toUpperCase()}${substring(1)}';
   }
 }
