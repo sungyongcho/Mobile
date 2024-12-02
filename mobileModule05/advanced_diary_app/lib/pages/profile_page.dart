@@ -12,7 +12,9 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  String? email; // Email passed via Navigator arguments
+  String? email;
+  String? firstName;
+  String? lastName;
   List<Map<String, dynamic>> _diaryEntries = []; // Diary entries list
 
   @override
@@ -21,6 +23,8 @@ class _ProfilePageState extends State<ProfilePage> {
     // Retrieve email from Navigator arguments
     final args = ModalRoute.of(context)!.settings.arguments as Map?;
     email = args?['email'];
+    firstName = args?['first_name'];
+    lastName = args?['last_name'];
 
     if (email != null) {
       _fetchDiaryEntries();
@@ -78,7 +82,16 @@ class _ProfilePageState extends State<ProfilePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Diary Entries'),
+        title: Column(
+          children: [
+            Text('My Diary Entries'),
+            if (firstName != null && lastName != null)
+              Text(
+                '$firstName $lastName',
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w400),
+              ),
+          ],
+        ),
         leading: IconButton(
           icon: Icon(Icons.arrow_back), // Custom back arrow
           onPressed: () {

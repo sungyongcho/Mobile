@@ -9,7 +9,7 @@ class AuthService {
   static const String _auth0ClientId = 'W5KMVcEuEUpdy9hK9isaE3tSszjuNbiD';
   static var auth0 = Auth0(_auth0Domain, _auth0ClientId);
 
-  static Future<String?> login() async {
+  static Future<Map<String, String>?> login() async {
     try {
       final result = await auth0
           .webAuthentication()
@@ -23,7 +23,11 @@ class AuthService {
       // Extract email from ID token
       final idToken = result.idToken!;
       final payload = _parseJwt(idToken);
-      return payload['email'];
+      return {
+        'email': payload['email'],
+        'first_name': payload['given_name'],
+        'last_name': payload['family_name'],
+      };
     } catch (e) {
       print('Login failed: $e');
     }
