@@ -26,7 +26,7 @@ class InitialLandingPage extends StatelessWidget {
                     context,
                     '/profile',
                     arguments: {
-                      'email': userDetails['email'],
+                      'username': userDetails['username'],
                       'first_name': userDetails['first_name'],
                       'last_name': userDetails['last_name'],
                     },

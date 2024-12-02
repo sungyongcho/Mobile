@@ -5,10 +5,10 @@ class FirestoreService {
 
   // Get all diary entries for a specific user
   static Future<List<Map<String, dynamic>>> getDiaryEntries(
-      String email) async {
+      String username) async {
     final querySnapshot = await _db
         .collection('notes')
-        // .where('usermail', isEqualTo: email)
+        .where('username', isEqualTo: username)
         // .orderBy('date', descending: true)
         .get();
 
@@ -21,14 +21,14 @@ class FirestoreService {
 
   // Save a new diary entry
   static Future<void> saveDiaryEntry({
-    required String email,
+    required String username,
     required String title,
     required String text,
     required String icon,
     required DateTime date,
   }) async {
     await _db.collection('notes').add({
-      'usermail': email,
+      'username': username,
       'title': title,
       'text': text,
       'icon': icon,

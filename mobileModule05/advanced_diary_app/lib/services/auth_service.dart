@@ -23,10 +23,39 @@ class AuthService {
       // Extract email from ID token
       final idToken = result.idToken!;
       final payload = _parseJwt(idToken);
+
+      final nickname = payload['nickname'] as String?; // GitHub field
+      final email = payload['email'] as String?; // Google field
+      final name = payload['name'] as String? ?? 'Unknown User';
+
+      String firstName = 'Unknown';
+      String lastName = 'Unknown';
+
+      if (payload.containsKey('given_name') &&
+          payload.containsKey('family_name')) {
+        firstName = payload['given_name'] as String;
+        lastName = payload['family_name'] as String;
+      }
+      // Fallback for GitHub: Split `name` into first and last names
+      else if (name != 'Unknown User') {
+        final nameParts = name.split(' ');
+        firstName = nameParts.isNotEmpty ? nameParts.first : 'Unknown';
+        lastName =
+            nameParts.length > 1 ? nameParts.sublist(1).join(' ') : 'Unknown';
+      }
+
+      // Determine the username: use email for Google, nickname for GitHub
+      final username = email ?? nickname;
+
+      if (username == null) {
+        throw Exception(
+            'User username (email or nickname) is required but not provided.');
+      }
+
       return {
-        'email': payload['email'],
-        'first_name': payload['given_name'],
-        'last_name': payload['family_name'],
+        'username': username,
+        'first_name': firstName,
+        'last_name': lastName,
       };
     } catch (e) {
       print('Login failed: $e');
