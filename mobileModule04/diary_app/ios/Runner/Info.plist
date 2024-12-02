@@ -50,5 +50,17 @@
 		<string>http</string>
 		<string>https</string>
 	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+			<string>com.auth0.flutter</string>
+			</array>
+		</dict>
+	</array>
+
 </dict>
 </plist>
