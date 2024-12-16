@@ -219,9 +219,22 @@ class _WeatherHomeState extends State<WeatherHome>
 
   AppBar _buildAppBar() {
     return AppBar(
-      leading: const Icon(
-        Icons.search,
-        color: Colors.white,
+      leading: IconButton(
+        icon: const Icon(Icons.search),
+        onPressed: () async {
+          if (suggestions.isNotEmpty) {
+            final firstSuggestion = suggestions[0];
+            await _fetchLocationData(
+              firstSuggestion['latitude'],
+              firstSuggestion['longitude'],
+            );
+            await _fetchWeatherData();
+            setState(() {
+              searchValue = '';
+              _inputController.clear();
+            });
+          }
+        },
       ),
       title: TextField(
         controller: _inputController,
@@ -249,17 +262,25 @@ class _WeatherHomeState extends State<WeatherHome>
           ),
         ),
         IconButton(
-          icon: const Icon(
-            Icons.location_pin,
-            color: Colors.white,
-          ),
-          onPressed: () {
-            _inputController.clear();
-            setState(() {});
+          icon: const Icon(Icons.location_pin),
+          onPressed: () async {
+            _inputController.clear(); // Clear the search input field
+            setState(() {
+              searchValue = ''; // Reset the search value
+              suggestions = []; // Clear suggestions
+              error = null; // Clear any error messages
+            });
+            try {
+              // Re-fetch location and weather data
+              await _fetchCurrentLocation();
+            } catch (e) {
+              // Handle errors gracefully
+              _setErrorState('Failed to restore GPS location: $e');
+            }
           },
         ),
       ],
-      backgroundColor: const Color.fromARGB(255, 91, 81, 212),
+      backgroundColor: const Color(0xFF5C5D72),
     );
   }
 
