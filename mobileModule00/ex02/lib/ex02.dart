@@ -98,7 +98,7 @@ class Ex02App extends StatelessWidget {
                     ], buttonPadding, buttonFontSize),
                     buildButtonRow([
                       ButtonData('0', Colors.black),
-                      ButtonData('.', Colors.black),
+                      ButtonData('-', Colors.black),
                       ButtonData('00', Colors.black),
                       ButtonData('=', Colors.white),
                       ButtonData(' ', Colors.white),
