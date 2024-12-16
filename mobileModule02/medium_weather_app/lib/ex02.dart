@@ -380,7 +380,9 @@ class _WeatherHomeState extends State<WeatherHome>
     return Expanded(
       child: TextButton(
         onPressed: () {
-          _tabController.animateTo(index);
+          setState(() {
+            _tabController.animateTo(index);
+          });
         },
         child: Column(
           mainAxisSize: MainAxisSize.min,
