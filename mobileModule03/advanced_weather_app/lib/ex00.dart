@@ -61,6 +61,12 @@ class _WeatherHomeState extends State<WeatherHome>
 
   void _initializeState() {
     _tabController = TabController(length: 3, vsync: this);
+    // Listener to update UI when swiping or tapping changes the tab
+    _tabController.addListener(() {
+      if (_tabController.index != _tabController.previousIndex) {
+        setState(() {});
+      }
+    });
     _inputController = TextEditingController();
     _fetchCurrentLocation();
   }
@@ -491,7 +497,9 @@ class _WeatherHomeState extends State<WeatherHome>
     return Expanded(
       child: TextButton(
         onPressed: () {
-          _tabController.animateTo(index);
+          setState(() {
+            _tabController.animateTo(index);
+          });
         },
         child: Column(
           mainAxisSize: MainAxisSize.min,
