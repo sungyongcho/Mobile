@@ -12,12 +12,15 @@ class DiaryEntryDetails extends StatelessWidget {
   Future<void> _deleteEntry(BuildContext context, String documentId) async {
     try {
       await FirestoreService.deleteDiaryEntry(
-          documentId); // Call Firestore delete
-      onDelete(); // Notify parent widget about deletion
-      Navigator.pop(context); // Close the modal after deletion
+          documentId); // Delete from Firestore
+
+      // Show success message first
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Entry deleted successfully!')),
       );
+
+      onDelete(); // Notify parent widget
+      Navigator.pop(context); // Then pop the modal bottom sheet
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Failed to delete entry: $e')),

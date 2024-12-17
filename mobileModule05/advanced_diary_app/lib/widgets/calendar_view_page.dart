@@ -102,21 +102,37 @@ class _CalendarViewState extends State<CalendarView> {
                 _updateSelectedEntries(selectedDay);
               });
             },
-            eventLoader: (day) =>
-                _markedDates[DateTime(day.year, day.month, day.day)]
-                    ?.map((e) => e['title'])
-                    .toList() ??
-                [],
+            // Returns a non-empty list if entries exist for that date
+            eventLoader: (day) {
+              return _markedDates[DateTime(day.year, day.month, day.day)]
+                      ?.map((e) => e['title'])
+                      .toList() ??
+                  [];
+            },
             calendarStyle: CalendarStyle(
-              todayDecoration: BoxDecoration(
-                color: Colors.blue,
-                shape: BoxShape.circle,
-              ),
-              selectedDecoration: BoxDecoration(
-                color: Colors.orange,
-                shape: BoxShape.circle,
-              ),
-              markerDecoration: BoxDecoration(),
+              todayDecoration:
+                  BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
+              selectedDecoration:
+                  BoxDecoration(color: Colors.orange, shape: BoxShape.circle),
+              // Turn off default marker decoration since we’ll customize it
+              markerDecoration: const BoxDecoration(),
+              // Force only one marker dot per day
+              markersMaxCount: 1,
+            ),
+            // Provide a singleMarkerBuilder to draw one red dot if day has events
+            calendarBuilders: CalendarBuilders(
+              singleMarkerBuilder: (context, date, event) {
+                return Container(
+                  width: 6,
+                  height: 6,
+                  margin: const EdgeInsets.only(
+                      bottom: 2), // spacing under the day text
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.red, // marker color
+                  ),
+                );
+              },
             ),
             availableCalendarFormats: const {
               CalendarFormat.month: 'Month',
